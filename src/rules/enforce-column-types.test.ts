@@ -58,10 +58,10 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
             errors: [
                 {
-                    messageId: 'typescript_typeorm_mismatch',
+                    messageId: 'typescript_typeorm_column_mismatch',
                     suggestions: [
                         {
-                            messageId: 'typescript_typeorm_suggestion',
+                            messageId: 'typescript_typeorm_column_suggestion',
                             output: `class Entity {
                 @Column({ type: 'string' })
                 str: string;
@@ -78,10 +78,10 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
             errors: [
                 {
-                    messageId: 'typescript_typeorm_mismatch',
+                    messageId: 'typescript_typeorm_column_mismatch',
                     suggestions: [
                         {
-                            messageId: 'typescript_typeorm_suggestion',
+                            messageId: 'typescript_typeorm_column_suggestion',
                             output: `class Entity {
                 @Column({ type: 'string', nullable: true })
                 str: string | null;
@@ -98,7 +98,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
             errors: [
                 {
-                    messageId: 'typescript_typeorm_mismatch',
+                    messageId: 'typescript_typeorm_column_mismatch',
                     suggestions: null,
                 },
             ],

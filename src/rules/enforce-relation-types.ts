@@ -1,28 +1,30 @@
-import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
+import { findDecoratorArguments, findParentClass } from '../utils/treeTraversal';
 import {
-    convertArgumentToColumnType,
-    convertTypeToColumnType,
+    convertArgumentToRelationType,
+    convertTypeToRelationType,
+    Relation,
+    relationTypes,
     isTypesEqual,
     typeToString,
-} from '../utils/columnType';
-import { findDecoratorArguments, findParentClass } from '../utils/treeTraversal';
+} from '../utils/relationType';
 
 const createRule = ESLintUtils.RuleCreator((name) => name);
 
 const enforceColumnTypes = createRule({
-    name: 'enforce-column-types',
+    name: 'enforce-relation-types',
     defaultOptions: [],
     meta: {
         type: 'problem',
         docs: {
-            description: 'TypeORM and TypeScript types should be the same on columns.',
+            description: 'TypeScript types should be consistent with the relations.',
             recommended: 'error',
         },
         hasSuggestions: true,
         messages: {
-            typescript_typeorm_column_mismatch:
-                'Type of {{ propertyName }}{{ className }} is not matching the TypeORM column type{{ expectedValue }}.',
-            typescript_typeorm_column_suggestion:
+            typescript_typeorm_relation_mismatch:
+                'Type of {{ propertyName }}{{ className }} is not consistent with the TypeORM relation type {{ relation }}{{ expectedValue }}.',
+            typescript_typeorm_relation_suggestion:
                 'Change the type of {{ propertyName }} to {{ expectedValue }}.',
         },
         schema: [],
@@ -30,19 +32,28 @@ const enforceColumnTypes = createRule({
     create(context) {
         return {
             PropertyDefinition(node) {
-                const columnArguments = findDecoratorArguments(node.decorators, 'Column');
-                if (!columnArguments?.[0] || !node.typeAnnotation) {
+                const relationsArguments = relationTypes.map(
+                    (relation): [Relation, TSESTree.CallExpressionArgument[] | undefined] => [
+                        relation,
+                        findDecoratorArguments(node.decorators, relation),
+                    ]
+                );
+                const relationArguments = relationsArguments.find(([, args]) => args);
+                if (!relationArguments) {
                     return;
                 }
 
-                const typeormType = convertArgumentToColumnType(columnArguments[0]);
+                const [relation, relArguments] = relationArguments;
+                const typeormType = convertArgumentToRelationType(relation, relArguments);
+
+                if (!node.typeAnnotation) {
+                    return;
+                }
                 const { typeAnnotation } = node.typeAnnotation;
-                const typescriptType = convertTypeToColumnType(typeAnnotation);
+                const typescriptType = convertTypeToRelationType(typeAnnotation);
 
                 if (!isTypesEqual(typeormType, typescriptType)) {
-                    const fixReplace = typeToString(typeormType, {
-                        literal: typescriptType?.literal,
-                    });
+                    const fixReplace = typeToString(typeormType);
 
                     // Construct strings for error message
                     const propertyName =
@@ -54,16 +65,17 @@ const enforceColumnTypes = createRule({
                     // Report the error
                     context.report({
                         node,
-                        messageId: 'typescript_typeorm_column_mismatch',
+                        messageId: 'typescript_typeorm_relation_mismatch',
                         data: {
                             className,
                             propertyName,
                             expectedValue,
+                            relation,
                         },
                         suggest: fixReplace
                             ? [
                                   {
-                                      messageId: 'typescript_typeorm_column_suggestion',
+                                      messageId: 'typescript_typeorm_relation_suggestion',
                                       fix: (fixer) => fixer.replaceText(typeAnnotation, fixReplace),
                                       data: {
                                           propertyName,

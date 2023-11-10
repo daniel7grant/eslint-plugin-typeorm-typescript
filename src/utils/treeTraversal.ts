@@ -31,6 +31,16 @@ export function findParentClass(
     return undefined;
 }
 
+export function findReturnedValue(node: TSESTree.Node | undefined): string | undefined {
+    if (
+        node?.type === AST_NODE_TYPES.ArrowFunctionExpression &&
+        node.body.type === AST_NODE_TYPES.Identifier
+    ) {
+        return node.body.name;
+    }
+    return undefined;
+}
+
 export function parseObjectLiteral(objectLiteral: TSESTree.Node): Record<string, unknown> {
     const parsedObject: Record<string, unknown> = {};
     if (objectLiteral.type === AST_NODE_TYPES.ObjectExpression) {
