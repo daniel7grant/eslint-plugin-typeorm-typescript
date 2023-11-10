@@ -91,5 +91,17 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                 },
             ],
         },
+        {
+            code: `class Entity {
+                @Column({ type: 'string', nullable: true })
+                str: 'one' | 'true';
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_mismatch',
+                    suggestions: null,
+                },
+            ],
+        },
     ],
 });

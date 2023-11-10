@@ -202,9 +202,16 @@ export function isTypesEqual(
     return toType.columnType === tsType.columnType && toType.nullable === tsType.nullable;
 }
 
-export function typeToString(column: ColumnType | undefined): string | undefined {
+interface TypeToStringMetadata {
+    literal?: boolean;
+}
+
+export function typeToString(
+    column: ColumnType | undefined,
+    { literal }: TypeToStringMetadata
+): string | undefined {
     // If unknown or literal, we don't suggest change
-    if (!column || column.columnType === 'other' || column.literal) {
+    if (!column || column.columnType === 'other' || literal) {
         return undefined;
     }
     return `${column.columnType}${column.nullable ? ' | null' : ''}`;
