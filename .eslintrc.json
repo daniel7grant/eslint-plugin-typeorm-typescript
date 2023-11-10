@@ -1,0 +1,29 @@
+{
+    "root": true,
+    "env": {
+        "commonjs": true,
+        "es2021": true,
+        "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "extends": [
+        "airbnb-base",
+        "airbnb-typescript/base",
+        "plugin:prettier/recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "project": "./tsconfig.json"
+    },
+    "settings": {
+        "node": {
+            "tryExtensions": [".js", ".json", ".ts"]
+        }
+    },
+    "rules": {
+        "prettier/prettier": ["error"]
+    }
+}

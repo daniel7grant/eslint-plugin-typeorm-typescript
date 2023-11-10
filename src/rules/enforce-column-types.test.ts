@@ -1,5 +1,5 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
-import { enforceColumnTypes } from './enforce-column-types';
+import enforceColumnTypes from './enforce-column-types';
 
 const ruleTester = new ESLintUtils.RuleTester({
     parser: '@typescript-eslint/parser',
@@ -35,6 +35,18 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
 
                 @Column({ type: 'timestamp', nullable: true })
                 dateNullable: Date | null;
+
+                @Column({ type: 'string' })
+                strLiteral: 'one' | 'two';
+
+                @Column({ type: 'string' })
+                strLiteral: 'one' | 'two';
+
+                @Column({ type: 'number' })
+                numLiteral: 1 | 2;
+
+                @Column({ type: 'boolean' })
+                numLiteral: true;
             }`,
         },
     ],
@@ -47,12 +59,17 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             errors: [
                 {
                     messageId: 'typescript_typeorm_mismatch',
-                },
-            ],
-            output: `class Entity {
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_suggestion',
+                            output: `class Entity {
                 @Column({ type: 'string' })
                 str: string;
             }`,
+                        },
+                    ],
+                },
+            ],
         },
         {
             code: `class Entity {
@@ -62,12 +79,17 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             errors: [
                 {
                     messageId: 'typescript_typeorm_mismatch',
-                },
-            ],
-            output: `class Entity {
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_suggestion',
+                            output: `class Entity {
                 @Column({ type: 'string', nullable: true })
                 str: string | null;
-            }`
+            }`,
+                        },
+                    ],
+                },
+            ],
         },
     ],
 });
