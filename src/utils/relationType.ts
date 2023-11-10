@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils';
-import { findReturnedValue, parseObjectLiteral } from './treeTraversal';
+import { findObjectArgument, findReturnedValue, parseObjectLiteral } from './treeTraversal';
 
 interface RelationType {
     name: string;
@@ -69,7 +69,7 @@ export function convertArgumentToRelationType(
     if (relation === 'OneToMany' || relation === 'ManyToMany') {
         return { name: otherEntity, isArray: true, nullable: false };
     } else {
-        const options = restArguments.find((arg) => arg.type === AST_NODE_TYPES.ObjectExpression);
+        const options = findObjectArgument(args);
         const { nullable } = options
             ? (parseObjectLiteral(options) as { nullable: boolean })
             : { nullable: true };
@@ -92,6 +92,32 @@ export function isTypesEqual(
         toType.nullable === tsType.nullable &&
         toType.isArray === tsType.isArray
     );
+}
+
+// Relations are nullable by default which can be confusing, help with a custom message
+export function isTypeMissingNullable(
+    toType: RelationType | undefined,
+    tsType: RelationType | undefined
+): boolean {
+    // If either is undefined, that means we are not sure of the types... ignore
+    if (!toType || !tsType) {
+        return false;
+    }
+    // Otherwise check if the relation should be nullable but not
+    return toType.name === tsType.name && toType.nullable && !tsType.nullable;
+}
+
+// Relations are nullable by default which can be confusing, help with a custom message
+export function isTypeMissingArray(
+    toType: RelationType | undefined,
+    tsType: RelationType | undefined
+): boolean {
+    // If either is undefined, that means we are not sure of the types... ignore
+    if (!toType || !tsType) {
+        return false;
+    }
+    // Otherwise check if the relation should be an array but not
+    return toType.name === tsType.name && toType.isArray && !tsType.isArray;
 }
 
 export function typeToString(relation: RelationType | undefined): string | undefined {

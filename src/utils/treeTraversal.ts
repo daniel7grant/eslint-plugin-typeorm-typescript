@@ -41,6 +41,12 @@ export function findReturnedValue(node: TSESTree.Node | undefined): string | und
     return undefined;
 }
 
+export function findObjectArgument(
+    args: TSESTree.CallExpressionArgument[] | undefined = []
+): TSESTree.CallExpressionArgument | undefined {
+    return args.find((arg) => arg.type === AST_NODE_TYPES.ObjectExpression);
+}
+
 export function parseObjectLiteral(objectLiteral: TSESTree.Node): Record<string, unknown> {
     const parsedObject: Record<string, unknown> = {};
     if (objectLiteral.type === AST_NODE_TYPES.ObjectExpression) {
