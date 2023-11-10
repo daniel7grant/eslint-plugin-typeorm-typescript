@@ -196,7 +196,7 @@ function typeToString(column: ColumnType | undefined): string | undefined {
     return `${column.columnType}${column.nullable ? ' | null' : ''}`;
 }
 
-const createRule = ESLintUtils.RuleCreator((name) => `https://example.com/rule/${name}`);
+const createRule = ESLintUtils.RuleCreator((name) => name);
 
 export const enforceColumnTypes = createRule({
     name: 'enforce-column-types',
