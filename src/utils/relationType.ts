@@ -32,7 +32,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
         }
         case AST_NODE_TYPES.TSUnionType: {
             return arg.types.reduce(
-                (acc, currentNode, i) => {
+                (acc, currentNode) => {
                     const current = convertTypeToRelationType(currentNode);
                     if (current) {
                         return {
@@ -50,8 +50,9 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                 } as RelationType
             );
         }
+        default:
+            return undefined;
     }
-    return undefined;
 }
 
 export function convertArgumentToRelationType(
@@ -66,16 +67,18 @@ export function convertArgumentToRelationType(
     if (!otherEntity) {
         return undefined;
     }
+
+    // OneToMany, ManyToMany
     if (relation === 'OneToMany' || relation === 'ManyToMany') {
         return { name: otherEntity, isArray: true, nullable: false };
-    } else {
-        const options = findObjectArgument(args);
-        const { nullable } = options
-            ? (parseObjectLiteral(options) as { nullable: boolean })
-            : { nullable: true };
-
-        return { name: otherEntity, isArray: false, nullable };
     }
+    // OneToOne, ManyToOne
+    const options = findObjectArgument(restArguments);
+    const { nullable } = options
+        ? (parseObjectLiteral(options) as { nullable: boolean })
+        : { nullable: true };
+
+    return { name: otherEntity, isArray: false, nullable };
 }
 
 export function isTypesEqual(
@@ -125,5 +128,12 @@ export function typeToString(relation: RelationType | undefined): string | undef
     if (!relation) {
         return undefined;
     }
-    return `${relation.name}${relation.nullable ? ' | null' : relation.isArray ? '[]' : ''}`;
+    let result = relation.name;
+    if (relation.isArray) {
+        result += '[]';
+    }
+    if (relation.nullable) {
+        result += ' | null';
+    }
+    return result;
 }

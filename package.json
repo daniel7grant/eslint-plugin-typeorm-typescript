@@ -13,6 +13,9 @@
     "license": "ISC",
     "devDependencies": {
         "eslint": "^8.43.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-config-airbnb-typescript": "^17.1.0",
+        "eslint-config-prettier": "^9.0.0",
         "eslint-plugin-prettier": "^4.2.1",
         "prettier": "^2.8.8",
         "ts-node": "^10.9.1",

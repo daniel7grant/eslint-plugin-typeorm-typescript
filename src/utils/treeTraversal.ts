@@ -4,18 +4,16 @@ export function findDecoratorArguments(
     decorators: TSESTree.Decorator[] | undefined,
     name: string
 ): TSESTree.CallExpressionArgument[] | undefined {
-    if (decorators) {
-        for (const decorator of decorators) {
-            if (
-                decorator.expression.type === AST_NODE_TYPES.CallExpression &&
-                decorator.expression.callee.type === AST_NODE_TYPES.Identifier &&
-                decorator.expression.callee.name === name
-            ) {
-                return decorator.expression.arguments;
-            }
+    return decorators?.reduce((previous, decorator) => {
+        if (
+            decorator.expression.type === AST_NODE_TYPES.CallExpression &&
+            decorator.expression.callee.type === AST_NODE_TYPES.Identifier &&
+            decorator.expression.callee.name === name
+        ) {
+            return decorator.expression.arguments;
         }
-    }
-    return undefined;
+        return previous;
+    }, undefined as TSESTree.CallExpressionArgument[] | undefined);
 }
 
 export function findParentClass(
@@ -48,17 +46,17 @@ export function findObjectArgument(
 }
 
 export function parseObjectLiteral(objectLiteral: TSESTree.Node): Record<string, unknown> {
-    const parsedObject: Record<string, unknown> = {};
     if (objectLiteral.type === AST_NODE_TYPES.ObjectExpression) {
-        for (const prop of objectLiteral.properties) {
+        return objectLiteral.properties.reduce((parsedObject, prop) => {
             if (
                 prop.type === AST_NODE_TYPES.Property &&
                 prop.key.type === AST_NODE_TYPES.Identifier &&
                 prop.value.type === AST_NODE_TYPES.Literal
             ) {
-                parsedObject[prop.key.name] = prop.value.value;
+                return { ...parsedObject, [prop.key.name]: prop.value.value };
             }
-        }
+            return parsedObject;
+        }, {} as Record<string, unknown>);
     }
-    return parsedObject;
+    return {};
 }

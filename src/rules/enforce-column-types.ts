@@ -7,7 +7,9 @@ import {
 } from '../utils/columnType';
 import { findDecoratorArguments, findParentClass } from '../utils/treeTraversal';
 
-const createRule = ESLintUtils.RuleCreator((name) => name);
+const createRule = ESLintUtils.RuleCreator(
+    (name) => `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#${name}`
+);
 
 const enforceColumnTypes = createRule({
     name: 'enforce-column-types',

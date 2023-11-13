@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
+import { ReportSuggestionArray } from '@typescript-eslint/utils/dist/ts-eslint';
 import {
     findDecoratorArguments,
     findObjectArgument,
@@ -14,9 +15,10 @@ import {
     isTypeMissingNullable,
     isTypeMissingArray,
 } from '../utils/relationType';
-import { ReportSuggestionArray } from '@typescript-eslint/utils/dist/ts-eslint';
 
-const createRule = ESLintUtils.RuleCreator((name) => name);
+const createRule = ESLintUtils.RuleCreator(
+    (name) => `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#${name}`
+);
 
 type EnforceColumnMessages =
     | 'typescript_typeorm_relation_mismatch'
