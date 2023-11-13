@@ -23,16 +23,8 @@ jobs:
         run: npm ci
       - name: Build TypeScript files
         run: npm run build
-      - name: Create release files
-        run: |
-          tar czf eslint-plugin-typeorm-typescript-${{ github.ref_name }}.tar.gz dist package*.json
-          zip -r eslint-plugin-typeorm-typescript-${{ github.ref_name }}.zip dist package*.json
       - name: Release to GitHub
         uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            eslint-plugin-typeorm-typescript-${{ github.ref_name }}.tar.gz
-            eslint-plugin-typeorm-typescript-${{ github.ref_name }}.zip
       - name: Publish to NPM
         run: npm publish
         env:
