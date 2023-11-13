@@ -16,7 +16,7 @@ Update `.eslintrc.json` with the plugin to the `plugins` key, and add it to the 
 
 ```json
 {
-  "plugins": [/*...*/, "typeorm-typescript"],
+  "plugins": ["typeorm-typescript"],
   "rules": {
     "typeorm-typescript/enforce-column-types": "error",
     "typeorm-typescript/enforce-relation-types": "error"

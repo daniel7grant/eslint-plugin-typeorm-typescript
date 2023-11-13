@@ -8,7 +8,8 @@ import {
 import { findDecoratorArguments, findParentClass } from '../utils/treeTraversal';
 
 const createRule = ESLintUtils.RuleCreator(
-    (name) => `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#${name}`
+    (name) =>
+        `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#typeorm-typescript${name}`
 );
 
 const enforceColumnTypes = createRule({

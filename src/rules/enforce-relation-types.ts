@@ -17,7 +17,8 @@ import {
 } from '../utils/relationType';
 
 const createRule = ESLintUtils.RuleCreator(
-    (name) => `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#${name}`
+    (name) =>
+        `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#typeorm-typescript${name}`
 );
 
 type EnforceColumnMessages =
