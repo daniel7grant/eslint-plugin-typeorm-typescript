@@ -1,16 +1,16 @@
 {
     "name": "eslint-plugin-typeorm-typescript",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "",
     "main": "dist/index.js",
-    "files": ["dist"],
+    "files": ["dist", "docs"],
     "scripts": {
         "build": "tsc -p tsconfig.json",
         "lint": "eslint src/",
         "test": "ts-node src/index.test.ts"
     },
-    "keywords": [],
-    "author": "",
+    "keywords": ["eslint", "typeorm", "typescript"],
+    "author": "Daniel Grant",
     "license": "ISC",
     "devDependencies": {
         "eslint": "^8.43.0",
