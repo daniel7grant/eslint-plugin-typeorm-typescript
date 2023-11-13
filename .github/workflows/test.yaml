@@ -1,4 +1,4 @@
-name: Release Node.js package
+name: Test Node.js package
 
 on: push
 
