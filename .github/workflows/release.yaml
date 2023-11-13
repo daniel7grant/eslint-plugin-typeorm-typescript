@@ -1,0 +1,36 @@
+name: Release Node.js package
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      - name: Setup Node v20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - name: Install dependencies
+        run: npm ci
+      - name: Build TypeScript files
+        run: npm run build
+      - name: Create release files
+        run: |
+          tar czf eslint-plugin-typeorm-typescript-${{ github.ref }}.tar.gz dist package*.json
+          zip -r eslint-plugin-typeorm-typescript-${{ github.ref }}.zip dist package*.json
+      - name: Release to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            eslint-plugin-typeorm-typescript-${{ github.ref }}.tar.gz
+            eslint-plugin-typeorm-typescript-${{ github.ref }}.zip
+      - name: Publish to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
