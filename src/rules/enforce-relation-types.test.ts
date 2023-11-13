@@ -88,9 +88,75 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
         },
         {
             code: `class Entity {
+                @OneToOne(() => Other, {})
+                @JoinColumn()
+                other: Other;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_nullable_by_default',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToOne(() => Other, {})
+                @JoinColumn()
+                other: Other | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            code: `class Entity {
                 @OneToOne(() => Other)
                 @JoinColumn()
                 other: Another | null;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Other | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            code: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: string;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Other | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            code: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: "other";
             }`,
             errors: [
                 {
@@ -154,6 +220,26 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
                 others: Another[];
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToMany(() => Other, (other) => other.entity)
+                others: Other[];
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            code: `class Entity {
+                @OneToMany(() => Other, (other) => other.entity)
+                others: string[];
             }`,
             errors: [
                 {
@@ -199,8 +285,48 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
         },
         {
             code: `class Entity {
+                @ManyToOne(() => Other, {})
+                other: Other;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_nullable_by_default',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToOne(() => Other, {})
+                other: Other | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            code: `class Entity {
                 @ManyToOne(() => Other)
                 other: Another | null;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToOne(() => Other)
+                other: Other | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            code: `class Entity {
+                @ManyToOne(() => Other)
+                other: string;
             }`,
             errors: [
                 {
@@ -264,6 +390,28 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
                 @ManyToMany(() => Other)
                 @JoinTable()
                 others: Another[];
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Other[];
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            code: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: string;
             }`,
             errors: [
                 {

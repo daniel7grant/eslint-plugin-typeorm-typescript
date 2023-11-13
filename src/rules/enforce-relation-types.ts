@@ -48,7 +48,7 @@ const enforceColumnTypes = createRule({
             typescript_typeorm_relation_suggestion:
                 'Change the type of {{ propertyName }} to {{ expectedValue }}.',
             typescript_typeorm_relation_nullable_by_default_suggestion:
-                'Make the {{ relation }} relation nullable.',
+                'Make the {{ relation }} relation nullable: false.',
         },
         schema: [],
     },

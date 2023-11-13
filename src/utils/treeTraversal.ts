@@ -45,8 +45,10 @@ export function findObjectArgument(
     return args.find((arg) => arg.type === AST_NODE_TYPES.ObjectExpression);
 }
 
-export function parseObjectLiteral(objectLiteral: TSESTree.Node): Record<string, unknown> {
-    if (objectLiteral.type === AST_NODE_TYPES.ObjectExpression) {
+export function parseObjectLiteral(
+    objectLiteral: TSESTree.Node | undefined
+): Record<string, unknown> {
+    if (objectLiteral?.type === AST_NODE_TYPES.ObjectExpression) {
         return objectLiteral.properties.reduce((parsedObject, prop) => {
             if (
                 prop.type === AST_NODE_TYPES.Property &&

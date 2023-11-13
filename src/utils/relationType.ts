@@ -10,22 +10,18 @@ interface RelationType {
 export const relationTypes = ['OneToOne', 'OneToMany', 'ManyToOne', 'ManyToMany'] as const;
 export type Relation = (typeof relationTypes)[number];
 
-export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType | undefined {
+export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType {
     switch (arg.type) {
         case AST_NODE_TYPES.TSTypeReference: {
-            if (arg.typeName.type === AST_NODE_TYPES.Identifier) {
-                return { name: arg.typeName.name, isArray: false, nullable: false };
-            }
-            return undefined;
+            return {
+                name: arg.typeName.type === AST_NODE_TYPES.Identifier ? arg.typeName.name : '',
+                isArray: false,
+                nullable: false,
+            };
         }
         case AST_NODE_TYPES.TSArrayType: {
-            if (
-                arg.elementType.type === AST_NODE_TYPES.TSTypeReference &&
-                arg.elementType.typeName.type === AST_NODE_TYPES.Identifier
-            ) {
-                return { name: arg.elementType.typeName.name, isArray: true, nullable: false };
-            }
-            return undefined;
+            const item = convertTypeToRelationType(arg.elementType);
+            return { ...item, isArray: true };
         }
         case AST_NODE_TYPES.TSNullKeyword: {
             return { name: '', isArray: false, nullable: true };
@@ -34,14 +30,11 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
             return arg.types.reduce(
                 (acc, currentNode) => {
                     const current = convertTypeToRelationType(currentNode);
-                    if (current) {
-                        return {
-                            name: acc.name || current.name,
-                            isArray: acc.isArray || current.isArray,
-                            nullable: acc.nullable || current.nullable,
-                        };
-                    }
-                    return acc;
+                    return {
+                        name: acc.name || current.name,
+                        isArray: acc.isArray || current.isArray,
+                        nullable: acc.nullable || current.nullable,
+                    };
                 },
                 {
                     name: '',
@@ -50,8 +43,9 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                 } as RelationType
             );
         }
-        default:
-            return undefined;
+        default: {
+            return { name: '', isArray: false, nullable: false };
+        }
     }
 }
 
@@ -74,11 +68,9 @@ export function convertArgumentToRelationType(
     }
     // OneToOne, ManyToOne
     const options = findObjectArgument(restArguments);
-    const { nullable } = options
-        ? (parseObjectLiteral(options) as { nullable: boolean })
-        : { nullable: true };
+    const parsedOptions = parseObjectLiteral(options) as { nullable?: boolean } | undefined;
 
-    return { name: otherEntity, isArray: false, nullable };
+    return { name: otherEntity, isArray: false, nullable: parsedOptions?.nullable ?? true };
 }
 
 export function isTypesEqual(
