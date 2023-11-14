@@ -22,7 +22,7 @@ export function findDecoratorArguments(
 export function findParentClass(
     node: TSESTree.PropertyDefinition,
 ): TSESTree.ClassDeclaration | undefined {
-    let parentClass = node.parent;
+    let parentClass: TSESTree.Node | undefined = node.parent;
     while (parentClass) {
         if (parentClass.type === AST_NODE_TYPES.ClassDeclaration) {
             return parentClass;

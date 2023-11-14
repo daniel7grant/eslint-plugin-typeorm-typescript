@@ -1,7 +1,13 @@
-import { ESLintUtils } from '@typescript-eslint/utils';
+import * as vitest from 'vitest';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 import enforceColumnTypes from './enforce-column-types';
 
-const ruleTester = new ESLintUtils.RuleTester({
+RuleTester.afterAll = vitest.afterAll;
+RuleTester.it = vitest.it;
+RuleTester.itOnly = vitest.it.only;
+RuleTester.describe = vitest.describe;
+
+const ruleTester = new RuleTester({
     parser: '@typescript-eslint/parser',
 });
 

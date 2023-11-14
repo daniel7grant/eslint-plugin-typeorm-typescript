@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
-import { ReportSuggestionArray } from '@typescript-eslint/utils/dist/ts-eslint';
+import { ReportSuggestionArray } from '@typescript-eslint/utils/ts-eslint';
 import {
     findDecoratorArguments,
     findObjectArgument,
@@ -35,7 +35,7 @@ const enforceColumnTypes = createRule({
         type: 'problem',
         docs: {
             description: 'TypeScript types should be consistent with the relations.',
-            recommended: 'error',
+            recommended: 'recommended',
         },
         hasSuggestions: true,
         messages: {

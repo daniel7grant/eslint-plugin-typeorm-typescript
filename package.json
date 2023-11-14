@@ -9,7 +9,7 @@
     "scripts": {
         "build": "tsc -p tsconfig.json",
         "lint": "eslint src/",
-        "test": "ts-node src/index.test.ts"
+        "test": "vitest run"
     },
     "homepage": "https://github.com/daniel7grant/eslint-plugin-typeorm-typescript",
     "repository": {
@@ -24,6 +24,7 @@
     "author": "Daniel Grant",
     "license": "ISC",
     "devDependencies": {
+        "@typescript-eslint/rule-tester": "^6.11.0",
         "eslint": "^8.43.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-airbnb-typescript": "^17.1.0",
@@ -31,10 +32,11 @@
         "eslint-plugin-prettier": "^5.0.1",
         "prettier": "^3.1.0",
         "ts-node": "^10.9.1",
-        "typescript": "^5.1.3"
+        "typescript": "^5.1.3",
+        "vitest": "^0.34.6"
     },
     "dependencies": {
         "@typescript-eslint/parser": "^6.10.0",
-        "@typescript-eslint/utils": "^5.62.0"
+        "@typescript-eslint/utils": "^6.11.0"
     }
 }
