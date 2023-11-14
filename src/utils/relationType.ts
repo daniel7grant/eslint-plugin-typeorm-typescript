@@ -40,7 +40,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                     name: '',
                     isArray: false,
                     nullable: false,
-                } as RelationType
+                } as RelationType,
             );
         }
         default: {
@@ -51,7 +51,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
 
 export function convertArgumentToRelationType(
     relation: Relation,
-    args: TSESTree.CallExpressionArgument[] | undefined
+    args: TSESTree.CallExpressionArgument[] | undefined,
 ): RelationType | undefined {
     if (!args) {
         return undefined;
@@ -75,7 +75,7 @@ export function convertArgumentToRelationType(
 
 export function isTypesEqual(
     toType: RelationType | undefined,
-    tsType: RelationType | undefined
+    tsType: RelationType | undefined,
 ): boolean {
     // If either is undefined, that means we are not sure of the types... ignore
     if (!toType || !tsType) {
@@ -92,7 +92,7 @@ export function isTypesEqual(
 // Relations are nullable by default which can be confusing, help with a custom message
 export function isTypeMissingNullable(
     toType: RelationType | undefined,
-    tsType: RelationType | undefined
+    tsType: RelationType | undefined,
 ): boolean {
     // If either is undefined, that means we are not sure of the types... ignore
     if (!toType || !tsType) {
@@ -105,7 +105,7 @@ export function isTypeMissingNullable(
 // Relations are nullable by default which can be confusing, help with a custom message
 export function isTypeMissingArray(
     toType: RelationType | undefined,
-    tsType: RelationType | undefined
+    tsType: RelationType | undefined,
 ): boolean {
     // If either is undefined, that means we are not sure of the types... ignore
     if (!toType || !tsType) {

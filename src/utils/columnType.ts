@@ -96,7 +96,7 @@ function convertTypeOrmToColumnType(arg: string): ColumnTypeString {
 }
 
 export function convertArgumentToColumnType(
-    arg: TSESTree.CallExpressionArgument
+    arg: TSESTree.CallExpressionArgument,
 ): ColumnType | undefined {
     const parsed = parseObjectLiteral(arg) as { type?: string; nullable?: boolean };
     if (parsed.type) {
@@ -150,7 +150,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
                     columnType: 'other',
                     nullable: false,
                     literal: false,
-                }
+                },
             );
         case AST_NODE_TYPES.TSLiteralType: // Literal type
             switch (arg.literal.type) {
@@ -184,7 +184,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
 
 export function isTypesEqual(
     toType: ColumnType | undefined,
-    tsType: ColumnType | undefined
+    tsType: ColumnType | undefined,
 ): boolean {
     // If either is undefined, that means we are not sure of the types... ignore
     if (!toType || !tsType) {
@@ -208,7 +208,7 @@ interface TypeToStringMetadata {
 
 export function typeToString(
     column: ColumnType | undefined,
-    { literal }: TypeToStringMetadata
+    { literal }: TypeToStringMetadata,
 ): string | undefined {
     // If unknown or literal, we don't suggest change
     if (!column || column.columnType === 'other' || literal) {

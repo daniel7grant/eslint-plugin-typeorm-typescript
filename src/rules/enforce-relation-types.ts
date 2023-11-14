@@ -18,7 +18,7 @@ import {
 
 const createRule = ESLintUtils.RuleCreator(
     (name) =>
-        `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#typeorm-typescript${name}`
+        `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#typeorm-typescript${name}`,
 );
 
 type EnforceColumnMessages =
@@ -59,7 +59,7 @@ const enforceColumnTypes = createRule({
                     (relation): [Relation, TSESTree.CallExpressionArgument[] | undefined] => [
                         relation,
                         findDecoratorArguments(node.decorators, relation),
-                    ]
+                    ],
                 );
                 const relationArguments = relationsArguments.find(([, args]) => args);
                 if (!relationArguments) {
