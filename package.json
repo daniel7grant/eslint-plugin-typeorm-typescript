@@ -1,6 +1,6 @@
 {
     "name": "eslint-plugin-typeorm-typescript",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "An ESLint plugin to catch mistakes if the TypeORM column types and TypeScript types aren't consistent.",
     "main": "dist/index.js",
     "files": [
