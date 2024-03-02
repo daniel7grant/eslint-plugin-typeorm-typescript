@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Add `text` type to stringLikes
+
 ## [0.2.3] - 2024-01-20
 
 ### Changed

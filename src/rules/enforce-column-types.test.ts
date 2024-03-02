@@ -18,6 +18,9 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                 @Column({ type: 'string' })
                 str: string;
 
+                @Column({ type: 'text' })
+                text: string;
+
                 @Column({ type: 'number' })
                 num: number;
 
@@ -32,6 +35,9 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                 
                 @Column({ type: 'varchar', nullable: true })
                 strNullable: string | null;
+
+                @Column({ type: 'text', nullable: true })
+                textNullable: string | null;
 
                 @Column({ type: 'int', nullable: true })
                 numNullable: number | null;

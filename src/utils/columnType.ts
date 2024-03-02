@@ -55,6 +55,7 @@ const stringLike = [
     'alphanum',
     'shorttext',
     'string',
+    'text',
 ];
 const dateLike = [
     'date',
