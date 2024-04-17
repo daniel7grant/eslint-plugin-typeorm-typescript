@@ -99,15 +99,19 @@ function convertTypeOrmToColumnType(arg: string): ColumnTypeString {
 export function convertArgumentToColumnType(
     arg: TSESTree.CallExpressionArgument,
 ): ColumnType | undefined {
-    const parsed = parseObjectLiteral(arg) as { type?: string; nullable?: boolean };
-    if (parsed.type) {
-        return {
-            columnType: convertTypeOrmToColumnType(parsed.type),
-            nullable: parsed.nullable ?? false,
-            literal: false,
-        };
+    const parsed = parseObjectLiteral(arg) as {
+        type?: string;
+        nullable?: boolean;
+        transformer?: object;
+    };
+    if (!parsed.type || parsed.transformer) {
+        return undefined;
     }
-    return undefined;
+    return {
+        columnType: convertTypeOrmToColumnType(parsed.type),
+        nullable: parsed.nullable ?? false,
+        literal: false,
+    };
 }
 
 export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | undefined {

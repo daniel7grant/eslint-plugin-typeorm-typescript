@@ -14,6 +14,7 @@ const ruleTester = new RuleTester({
 ruleTester.run('enforce-column-types', enforceColumnTypes, {
     valid: [
         {
+            name: 'should allow matching column types',
             code: `class Entity {
                 @Column({ type: 'string' })
                 str: string;
@@ -61,9 +62,23 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                 numLiteral: true;
             }`,
         },
+        {
+            name: 'should ignore unknown types',
+            code: `class Entity {
+                @Column({ type: 'json' })
+                unknownField: unknown;
+
+                @Column({ type: 'json' })
+                reference: JsonObject;
+
+                @Column({ type: 'text', transformer: { from() {}, to() {} } })
+                transformed: number;
+            }`
+        }
     ],
     invalid: [
         {
+            name: 'should fail on nullable TypeScript type',
             code: `class Entity {
                 @Column({ type: 'string' })
                 str: string | null;
@@ -84,6 +99,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             ],
         },
         {
+            name: 'should fail on nullable TypeORM type',
             code: `class Entity {
                 @Column({ type: 'string', nullable: true })
                 str: string;
@@ -104,6 +120,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             ],
         },
         {
+            name: 'should fail on nullable TypeORM type',
             code: `class Entity {
                 @Column({ type: 'string', nullable: true })
                 str: 'one' | 'true';

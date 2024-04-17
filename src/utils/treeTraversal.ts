@@ -56,10 +56,14 @@ export function parseObjectLiteral(
             (parsedObject, prop) => {
                 if (
                     prop.type === AST_NODE_TYPES.Property &&
-                    prop.key.type === AST_NODE_TYPES.Identifier &&
-                    prop.value.type === AST_NODE_TYPES.Literal
+                    prop.key.type === AST_NODE_TYPES.Identifier
                 ) {
-                    return { ...parsedObject, [prop.key.name]: prop.value.value };
+                    if (prop.value.type === AST_NODE_TYPES.Literal) {
+                        return { ...parsedObject, [prop.key.name]: prop.value.value };
+                    } else {
+                        // Handle unknown values as object for transformer
+                        return { ...parsedObject, [prop.key.name]: {} };
+                    }
                 }
                 return parsedObject;
             },
