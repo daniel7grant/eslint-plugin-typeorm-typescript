@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.2.5] - 2024-04-17
+
+### Changed
+
+- Ignore column check when the transformer property is set
+- Test cases when unknown object or reference type
+- Update dependencies
+
 ## [0.2.4] - 2024-03-02
 
 ### Changed
