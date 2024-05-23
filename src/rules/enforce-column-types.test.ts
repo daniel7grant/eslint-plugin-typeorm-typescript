@@ -14,50 +14,106 @@ const ruleTester = new RuleTester({
 ruleTester.run('enforce-column-types', enforceColumnTypes, {
     valid: [
         {
-            name: 'should allow matching column types',
+            name: 'should allow matching string column types',
             code: `class Entity {
                 @Column({ type: 'string' })
                 str: string;
-
+            }`,
+        },
+        {
+            name: 'should allow matching string column types',
+            code: `class Entity {
                 @Column({ type: 'text' })
                 text: string;
-
+            }`,
+        },
+        {
+            name: 'should allow matching number column types',
+            code: `class Entity {
                 @Column({ type: 'number' })
                 num: number;
-
+            }`,
+        },
+        {
+            name: 'should allow matching bool column types',
+            code: `class Entity {
                 @Column({ type: 'boolean' })
                 bool: boolean;
-
+            }`,
+        },
+        {
+            name: 'should allow matching date column types',
+            code: `class Entity {
                 @Column({ type: 'timestamp' })
                 date: Date;
-
+            }`,
+        },
+        {
+            name: 'should allow matching date string column types',
+            code: `class Entity {
                 @Column({ type: 'timestamp' })
                 dateStr: string;
-                
+            }`,
+        },
+        {
+            name: 'should allow matching string nullable column types',
+            code: `class Entity {
                 @Column({ type: 'varchar', nullable: true })
                 strNullable: string | null;
-
+            }`,
+        },
+        {
+            name: 'should allow matching text nullable column types',
+            code: `class Entity {
                 @Column({ type: 'text', nullable: true })
                 textNullable: string | null;
-
+            }`,
+        },
+        {
+            name: 'should allow matching number nullable column types',
+            code: `class Entity {
                 @Column({ type: 'int', nullable: true })
                 numNullable: number | null;
-
+            }`,
+        },
+        {
+            name: 'should allow matching bool nullable column types',
+            code: `class Entity {
                 @Column({ type: 'bool', nullable: true })
                 boolNullable: boolean | null;
-
+            }`,
+        },
+        {
+            name: 'should allow matching date nullable column types',
+            code: `class Entity {
                 @Column({ type: 'timestamp', nullable: true })
                 dateNullable: Date | null;
-
+            }`,
+        },
+        {
+            name: 'should allow matching string literal column types',
+            code: `class Entity {
                 @Column({ type: 'string' })
                 strLiteral: 'one' | 'two';
-
+            }`,
+        },
+        {
+            name: 'should allow matching string literal column types',
+            code: `class Entity {
                 @Column({ type: 'string' })
                 strLiteral: 'one' | 'two';
-
+            }`,
+        },
+        {
+            name: 'should allow matching number literal column types',
+            code: `class Entity {
                 @Column({ type: 'number' })
                 numLiteral: 1 | 2;
-
+            }`,
+        },
+        {
+            name: 'should allow matching number literal column types',
+            code: `class Entity {
                 @Column({ type: 'boolean' })
                 numLiteral: true;
             }`,
@@ -67,14 +123,22 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             code: `class Entity {
                 @Column({ type: 'json' })
                 unknownField: unknown;
-
+            }`,
+        },
+        {
+            name: 'should ignore reference types',
+            code: `class Entity {
                 @Column({ type: 'json' })
                 reference: JsonObject;
-
+            }`,
+        },
+        {
+            name: 'should ignore transformed types',
+            code: `class Entity {
                 @Column({ type: 'text', transformer: { from() {}, to() {} } })
                 transformed: number;
-            }`
-        }
+            }`,
+        },
     ],
     invalid: [
         {
