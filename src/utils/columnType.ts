@@ -7,6 +7,7 @@ interface ColumnType {
     columnType: ColumnTypeString;
     nullable: boolean;
     literal: boolean;
+    array: boolean;
 }
 
 // From: https://github.com/typeorm/typeorm/blob/master/src/driver/types/ColumnTypes.ts
@@ -103,6 +104,7 @@ export function convertArgumentToColumnType(
         type?: string;
         nullable?: boolean;
         transformer?: object;
+        array?: boolean;
     };
     if (!parsed.type || parsed.transformer) {
         return undefined;
@@ -111,27 +113,28 @@ export function convertArgumentToColumnType(
         columnType: convertTypeOrmToColumnType(parsed.type),
         nullable: parsed.nullable ?? false,
         literal: false,
+        array: parsed.array ?? false,
     };
 }
 
 export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | undefined {
     switch (arg.type) {
         case AST_NODE_TYPES.TSStringKeyword:
-            return { columnType: 'string', nullable: false, literal: false };
+            return { columnType: 'string', nullable: false, literal: false, array: false };
 
         case AST_NODE_TYPES.TSBigIntKeyword:
         case AST_NODE_TYPES.TSNumberKeyword:
-            return { columnType: 'number', nullable: false, literal: false };
+            return { columnType: 'number', nullable: false, literal: false, array: false };
 
         case AST_NODE_TYPES.TSBooleanKeyword:
-            return { columnType: 'boolean', nullable: false, literal: false };
+            return { columnType: 'boolean', nullable: false, literal: false, array: false };
 
         case AST_NODE_TYPES.TSNullKeyword:
-            return { columnType: 'other', nullable: true, literal: false };
+            return { columnType: 'other', nullable: true, literal: false, array: false };
 
         case AST_NODE_TYPES.TSTypeReference:
             if (arg.typeName.type === AST_NODE_TYPES.Identifier && arg.typeName.name === 'Date') {
-                return { columnType: 'date', nullable: false, literal: false };
+                return { columnType: 'date', nullable: false, literal: false, array: false };
             }
             return undefined;
 
@@ -147,6 +150,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
                                     : acc.columnType,
                             nullable: current.nullable || acc.nullable,
                             literal: current.literal || acc.literal,
+                            array: current.array || acc.array,
                         };
                     }
                     return acc;
@@ -155,6 +159,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
                     columnType: 'other',
                     nullable: false,
                     literal: false,
+                    array: false,
                 },
             );
         case AST_NODE_TYPES.TSLiteralType: // Literal type
@@ -166,19 +171,27 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
                             columnType: literalType as ColumnTypeString,
                             nullable: false,
                             literal: true,
+                            array: false,
                         };
                     }
                     return undefined;
                 }
                 case AST_NODE_TYPES.TemplateLiteral:
-                    return { columnType: 'string', nullable: false, literal: true };
+                    return { columnType: 'string', nullable: false, literal: true, array: false };
                 default:
                     return undefined;
             }
 
+        case AST_NODE_TYPES.TSArrayType: {
+            const item = convertTypeToColumnType(arg.elementType);
+            if (item) {
+                return { ...item, array: true };
+            }
+            return item;
+        }
+
         // TODO: handles these types too
         case AST_NODE_TYPES.TSObjectKeyword: // Object type
-        case AST_NODE_TYPES.TSArrayType: // Array type
         case AST_NODE_TYPES.TSAnyKeyword: // Unknown types
         case AST_NODE_TYPES.TSUndefinedKeyword:
         case AST_NODE_TYPES.TSUnknownKeyword:
@@ -199,12 +212,17 @@ export function isTypesEqual(
     if (
         toType.columnType === 'date' &&
         tsType.columnType === 'string' &&
-        toType.nullable === tsType.nullable
+        toType.nullable === tsType.nullable &&
+        toType.array === tsType.array
     ) {
         return true;
     }
     // Otherwise just check field equality
-    return toType.columnType === tsType.columnType && toType.nullable === tsType.nullable;
+    return (
+        toType.columnType === tsType.columnType &&
+        toType.nullable === tsType.nullable &&
+        toType.array === tsType.array
+    );
 }
 
 interface TypeToStringMetadata {
@@ -219,5 +237,5 @@ export function typeToString(
     if (!column || column.columnType === 'other' || literal) {
         return undefined;
     }
-    return `${column.columnType}${column.nullable ? ' | null' : ''}`;
+    return `${column.columnType}${column.array ? '[]' : ''}${column.nullable ? ' | null' : ''}`;
 }

@@ -119,6 +119,20 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
+            name: 'should allow matching array nullable column types',
+            code: `class Entity {
+                @Column({ type: 'string', array: true, nullable: true })
+                arrayNullable: string[] | null;
+            }`,
+        },
+        {
+            name: 'should allow matching array column types',
+            code: `class Entity {
+                @Column({ type: 'string', array: true })
+                array: string[];
+            }`,
+        },
+        {
             name: 'should ignore unknown types',
             code: `class Entity {
                 @Column({ type: 'json' })
@@ -193,6 +207,48 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                 {
                     messageId: 'typescript_typeorm_column_mismatch',
                     suggestions: null,
+                },
+            ],
+        },
+        {
+            name: 'should fail on array TypeORM type',
+            code: `class Entity {
+                @Column({ type: 'string', array: true })
+                str: string;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'string', array: true })
+                str: string[];
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-array TypeORM type',
+            code: `class Entity {
+                @Column({ type: 'string' })
+                str: string[];
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'string' })
+                str: string;
+            }`,
+                        },
+                    ],
                 },
             ],
         },
