@@ -19,7 +19,7 @@ const enforceColumnTypes = createRule({
         type: 'problem',
         docs: {
             description: 'TypeORM and TypeScript types should be the same on columns.',
-            recommended: 'recommended',
+            // recommended: 'recommended',
         },
         hasSuggestions: true,
         messages: {

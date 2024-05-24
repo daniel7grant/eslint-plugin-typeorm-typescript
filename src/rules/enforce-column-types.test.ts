@@ -73,8 +73,8 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
 
                 @Column({ type: 'text', transformer: { from() {}, to() {} } })
                 transformed: number;
-            }`
-        }
+            }`,
+        },
     ],
     invalid: [
         {

@@ -35,7 +35,7 @@ const enforceColumnTypes = createRule({
         type: 'problem',
         docs: {
             description: 'TypeScript types should be consistent with the relations.',
-            recommended: 'recommended',
+            // recommended: 'recommended',
         },
         hasSuggestions: true,
         messages: {
