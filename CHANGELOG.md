@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add array column field to test for array types ([#3](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/3))
+- Add support for Column with unset type ([#7](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/7))
+
+## Changed
+
+- Refactor internal column types
+    - Replace date with Date to match with TypeScript type ([#6](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/6))
+    - Replace other with unknown
+    - Change undefined cases to unknown
+- Refactor tests to provide better messages
+
 ## [0.2.5] - 2024-04-17
 
 ### Changed
