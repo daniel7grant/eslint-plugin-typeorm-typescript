@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.6] - 2024-05-31
+
 ### Added
 
 - Add array column field to test for array types ([#3](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/3))
