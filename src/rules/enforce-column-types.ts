@@ -43,9 +43,7 @@ const enforceColumnTypes = createRule({
                 const typescriptType = convertTypeToColumnType(typeAnnotation);
 
                 if (!isTypesEqual(typeormType, typescriptType)) {
-                    const fixReplace = typeToString(typeormType, {
-                        literal: typescriptType?.literal,
-                    });
+                    const fixReplace = typeToString(typeormType, typescriptType);
 
                     // Construct strings for error message
                     const propertyName =

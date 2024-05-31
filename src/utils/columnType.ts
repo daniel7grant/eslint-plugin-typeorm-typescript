@@ -97,9 +97,7 @@ function convertTypeOrmToColumnType(arg: string): ColumnTypeString {
     return 'unknown';
 }
 
-export function convertArgumentToColumnType(
-    arg: TSESTree.CallExpressionArgument,
-): ColumnType | undefined {
+export function convertArgumentToColumnType(arg: TSESTree.CallExpressionArgument): ColumnType {
     const parsed = parseObjectLiteral(arg) as {
         type?: string;
         nullable?: boolean;
@@ -107,7 +105,12 @@ export function convertArgumentToColumnType(
         array?: boolean;
     };
     if (!parsed.type || parsed.transformer) {
-        return undefined;
+        return {
+            columnType: 'unknown',
+            nullable: parsed.nullable ?? false,
+            literal: false,
+            array: parsed.array ?? false,
+        };
     }
     return {
         columnType: convertTypeOrmToColumnType(parsed.type),
@@ -117,7 +120,7 @@ export function convertArgumentToColumnType(
     };
 }
 
-export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | undefined {
+export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
     switch (arg.type) {
         case AST_NODE_TYPES.TSStringKeyword:
             return { columnType: 'string', nullable: false, literal: false, array: false };
@@ -136,7 +139,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
             if (arg.typeName.type === AST_NODE_TYPES.Identifier && arg.typeName.name === 'Date') {
                 return { columnType: 'Date', nullable: false, literal: false, array: false };
             }
-            return undefined;
+            return { columnType: 'unknown', nullable: false, literal: false, array: false };
 
         case AST_NODE_TYPES.TSUnionType:
             return arg.types.reduce<ColumnType>(
@@ -174,12 +177,12 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
                             array: false,
                         };
                     }
-                    return undefined;
+                    return { columnType: 'unknown', nullable: false, literal: true, array: false };
                 }
                 case AST_NODE_TYPES.TemplateLiteral:
                     return { columnType: 'string', nullable: false, literal: true, array: false };
                 default:
-                    return undefined;
+                    return { columnType: 'unknown', nullable: false, literal: true, array: false };
             }
 
         case AST_NODE_TYPES.TSArrayType: {
@@ -196,17 +199,14 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
         case AST_NODE_TYPES.TSUndefinedKeyword:
         case AST_NODE_TYPES.TSUnknownKeyword:
         default:
-            return undefined;
+            return { columnType: 'unknown', nullable: false, literal: false, array: false };
     }
 }
 
-export function isTypesEqual(
-    toType: ColumnType | undefined,
-    tsType: ColumnType | undefined,
-): boolean {
-    // If either is undefined, that means we are not sure of the types... ignore
-    if (!toType || !tsType) {
-        return true;
+export function isTypesEqual(toType: ColumnType, tsType: ColumnType): boolean {
+    // If either is unknown, we only check the nullability
+    if (toType.columnType === 'unknown' || tsType.columnType === 'unknown') {
+        return toType.nullable === tsType.nullable && toType.array === tsType.array;
     }
     // Dates can be parsed into strings too
     if (
@@ -225,17 +225,15 @@ export function isTypesEqual(
     );
 }
 
-interface TypeToStringMetadata {
-    literal?: boolean;
-}
-
 export function typeToString(
-    column: ColumnType | undefined,
-    { literal }: TypeToStringMetadata,
+    column: ColumnType,
+    { literal, columnType: tsColumnType }: ColumnType,
 ): string | undefined {
-    // If unknown or literal, we don't suggest change
-    if (!column || column.columnType === 'unknown' || literal) {
+    // If column type is unknown, we fall back to the TypeScript column type
+    const columnType = column.columnType !== 'unknown' ? column.columnType : tsColumnType;
+    // If type is unknown or literal, we don't suggest change
+    if (columnType === 'unknown' || literal) {
         return undefined;
     }
-    return `${column.columnType}${column.array ? '[]' : ''}${column.nullable ? ' | null' : ''}`;
+    return `${columnType}${column.array ? '[]' : ''}${column.nullable ? ' | null' : ''}`;
 }

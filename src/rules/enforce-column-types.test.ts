@@ -133,6 +133,20 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
+            name: 'should allow unset types',
+            code: `class Entity {
+                @Column()
+                unsetField: unknown;
+            }`,
+        },
+        {
+            name: 'should allow nullable unset types',
+            code: `class Entity {
+                @Column({ nullable: true })
+                unsetNullable: unset | null;
+            }`,
+        },
+        {
             name: 'should ignore unknown types',
             code: `class Entity {
                 @Column({ type: 'json' })
@@ -140,10 +154,24 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
+            name: 'should allow nullable unknown types',
+            code: `class Entity {
+                @Column({ type: 'json', nullable: true })
+                unknownNullable: unknown | null;
+            }`,
+        },
+        {
             name: 'should ignore reference types',
             code: `class Entity {
                 @Column({ type: 'json' })
                 reference: JsonObject;
+            }`,
+        },
+        {
+            name: 'should allow nullable reference types',
+            code: `class Entity {
+                @Column({ type: 'json', nullable: true })
+                referenceNullable: JsonObject | null;
             }`,
         },
         {
@@ -309,6 +337,27 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                             output: `class Entity {
                 @Column({ type: 'string' })
                 str: string;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on unknown TypeORM type',
+            code: `class Entity {
+                @Column({ nullable: true })
+                something: string;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ nullable: true })
+                something: string | null;
             }`,
                         },
                     ],
