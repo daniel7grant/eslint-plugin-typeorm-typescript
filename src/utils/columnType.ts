@@ -1,7 +1,7 @@
 import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils';
 import { parseObjectLiteral } from './treeTraversal';
 
-type ColumnTypeString = 'string' | 'number' | 'boolean' | 'date' | 'other';
+type ColumnTypeString = 'string' | 'number' | 'boolean' | 'Date' | 'unknown';
 
 interface ColumnType {
     columnType: ColumnTypeString;
@@ -92,9 +92,9 @@ function convertTypeOrmToColumnType(arg: string): ColumnTypeString {
         return 'string';
     }
     if (dateLike.includes(arg)) {
-        return 'date';
+        return 'Date';
     }
-    return 'other';
+    return 'unknown';
 }
 
 export function convertArgumentToColumnType(
@@ -130,11 +130,11 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
             return { columnType: 'boolean', nullable: false, literal: false, array: false };
 
         case AST_NODE_TYPES.TSNullKeyword:
-            return { columnType: 'other', nullable: true, literal: false, array: false };
+            return { columnType: 'unknown', nullable: true, literal: false, array: false };
 
         case AST_NODE_TYPES.TSTypeReference:
             if (arg.typeName.type === AST_NODE_TYPES.Identifier && arg.typeName.name === 'Date') {
-                return { columnType: 'date', nullable: false, literal: false, array: false };
+                return { columnType: 'Date', nullable: false, literal: false, array: false };
             }
             return undefined;
 
@@ -145,7 +145,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
                     if (current) {
                         return {
                             columnType:
-                                current.columnType !== 'other'
+                                current.columnType !== 'unknown'
                                     ? current.columnType
                                     : acc.columnType,
                             nullable: current.nullable || acc.nullable,
@@ -156,7 +156,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType | un
                     return acc;
                 },
                 {
-                    columnType: 'other',
+                    columnType: 'unknown',
                     nullable: false,
                     literal: false,
                     array: false,
@@ -210,7 +210,7 @@ export function isTypesEqual(
     }
     // Dates can be parsed into strings too
     if (
-        toType.columnType === 'date' &&
+        toType.columnType === 'Date' &&
         tsType.columnType === 'string' &&
         toType.nullable === tsType.nullable &&
         toType.array === tsType.array
@@ -234,7 +234,7 @@ export function typeToString(
     { literal }: TypeToStringMetadata,
 ): string | undefined {
     // If unknown or literal, we don't suggest change
-    if (!column || column.columnType === 'other' || literal) {
+    if (!column || column.columnType === 'unknown' || literal) {
         return undefined;
     }
     return `${column.columnType}${column.array ? '[]' : ''}${column.nullable ? ' | null' : ''}`;

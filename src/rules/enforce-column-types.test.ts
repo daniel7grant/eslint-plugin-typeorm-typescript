@@ -156,6 +156,69 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
     ],
     invalid: [
         {
+            name: 'should fail on non-number TypeScript type',
+            code: `class Entity {
+                @Column({ type: 'integer' })
+                num: string;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'integer' })
+                num: number;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-string TypeScript type',
+            code: `class Entity {
+                @Column({ type: 'string' })
+                str: number;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'string' })
+                str: string;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-date TypeScript type',
+            code: `class Entity {
+                @Column({ type: 'date' })
+                date: number;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'date' })
+                date: Date;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
             name: 'should fail on nullable TypeScript type',
             code: `class Entity {
                 @Column({ type: 'string' })
