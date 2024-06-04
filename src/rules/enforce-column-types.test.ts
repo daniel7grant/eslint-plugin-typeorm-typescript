@@ -364,5 +364,26 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                 },
             ],
         },
+        {
+            name: 'should fail on non-nullable empty TypeORM type',
+            code: `class Entity {
+                @Column()
+                empty: string | null;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column()
+                empty: string;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
     ],
 });

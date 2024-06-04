@@ -97,7 +97,9 @@ function convertTypeOrmToColumnType(arg: string): ColumnTypeString {
     return 'unknown';
 }
 
-export function convertArgumentToColumnType(arg: TSESTree.CallExpressionArgument): ColumnType {
+export function convertArgumentToColumnType(
+    arg: TSESTree.CallExpressionArgument | undefined,
+): ColumnType {
     const parsed = parseObjectLiteral(arg) as {
         type?: string;
         nullable?: boolean;

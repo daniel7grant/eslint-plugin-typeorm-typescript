@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Fixed issue when empty Column type doesn't get report nullability errors
+
 ## [0.2.6] - 2024-05-31
 
 ### Added

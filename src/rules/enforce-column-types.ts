@@ -34,7 +34,7 @@ const enforceColumnTypes = createRule({
         return {
             PropertyDefinition(node) {
                 const columnArguments = findDecoratorArguments(node.decorators, 'Column');
-                if (!columnArguments?.[0] || !node.typeAnnotation) {
+                if (!columnArguments || !node.typeAnnotation) {
                     return;
                 }
 
