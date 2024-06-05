@@ -38,7 +38,7 @@ const enforceColumnTypes = createRule({
                     return;
                 }
 
-                const typeormType = convertArgumentToColumnType(columnArguments[0]);
+                const typeormType = convertArgumentToColumnType(columnArguments);
                 const { typeAnnotation } = node.typeAnnotation;
                 const typescriptType = convertTypeToColumnType(typeAnnotation);
 

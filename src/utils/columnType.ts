@@ -97,15 +97,27 @@ function convertTypeOrmToColumnType(arg: string): ColumnTypeString {
     return 'unknown';
 }
 
-export function convertArgumentToColumnType(
-    arg: TSESTree.CallExpressionArgument | undefined,
-): ColumnType {
-    const parsed = parseObjectLiteral(arg) as {
-        type?: string;
-        nullable?: boolean;
-        transformer?: object;
-        array?: boolean;
-    };
+export function convertArgumentToColumnType(args: TSESTree.CallExpressionArgument[]): ColumnType {
+    const parsed = args.reduce(
+        (prev, arg) => {
+            switch (arg.type) {
+                case AST_NODE_TYPES.ObjectExpression:
+                    return { ...prev, ...parseObjectLiteral(arg) };
+                case AST_NODE_TYPES.Literal:
+                    if (typeof arg.value === 'string') {
+                        return { ...prev, type: arg.value };
+                    }
+                default:
+                    return prev;
+            }
+        },
+        {} as {
+            type?: string;
+            nullable?: boolean;
+            transformer?: object;
+            array?: boolean;
+        },
+    );
     if (!parsed.type || parsed.transformer) {
         return {
             columnType: 'unknown',

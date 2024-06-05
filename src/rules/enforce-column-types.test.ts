@@ -21,6 +21,13 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
+            name: 'should allow matching string column types with string type',
+            code: `class Entity {
+                @Column('string')
+                strString: string;
+            }`,
+        },
+        {
             name: 'should allow matching string column types',
             code: `class Entity {
                 @Column({ type: 'text' })
@@ -60,6 +67,13 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             code: `class Entity {
                 @Column({ type: 'varchar', nullable: true })
                 strNullable: string | null;
+            }`,
+        },
+        {
+            name: 'should allow matching string nullable column types with string type',
+            code: `class Entity {
+                @Column('string', { nullable: true })
+                strString: string | null;
             }`,
         },
         {
@@ -205,6 +219,27 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             ],
         },
         {
+            name: 'should fail on non-number TypeScript type with string type',
+            code: `class Entity {
+                @Column('integer')
+                numString: string;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column('integer')
+                numString: number;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
             name: 'should fail on non-string TypeScript type',
             code: `class Entity {
                 @Column({ type: 'string' })
@@ -282,6 +317,27 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                             output: `class Entity {
                 @Column({ type: 'string', nullable: true })
                 str: string | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on nullable TypeORM type with string type',
+            code: `class Entity {
+                @Column('string', { nullable: true })
+                strString: string;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column('string', { nullable: true })
+                strString: string | null;
             }`,
                         },
                     ],

@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+
+- Allow Column decorator to handle string parameters, multiple parameters
+
 ### Changed
 
-- Fixed issue when empty Column type doesn't get report nullability errors
+- Fix issue when empty Column type doesn't get report nullability errors
 
 ## [0.2.6] - 2024-05-31
 
