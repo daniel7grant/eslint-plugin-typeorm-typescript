@@ -7,8 +7,7 @@ interface RelationType {
     isArray: boolean;
 }
 
-export const relationTypes = ['OneToOne', 'OneToMany', 'ManyToOne', 'ManyToMany'] as const;
-export type Relation = (typeof relationTypes)[number];
+export type Relation = 'OneToOne' | 'OneToMany' | 'ManyToOne' | 'ManyToMany';
 
 export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType {
     switch (arg.type) {

@@ -5,6 +5,11 @@
 ### Added
 
 - Allow Column decorator to handle string parameters, multiple parameters
+- Add UUID column-type to string types
+- Add support for additional Column decorators:
+    - Primary column decorators `PrimaryColumn`, `PrimaryGeneratedColumn` is number by default,
+    - Date column decorators `CreateDateColumn`, `UpdateDateColumn` is date by default, `DeleteDateColumn` is nullable,
+    - Version column decorator `VersionColumn` is number.
 
 ### Changed
 

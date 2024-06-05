@@ -1,6 +1,15 @@
 import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils';
 import { parseObjectLiteral } from './treeTraversal';
 
+type Column =
+    | 'Column'
+    | 'PrimaryColumn'
+    | 'PrimaryGeneratedColumn'
+    | 'CreateDateColumn'
+    | 'UpdateDateColumn'
+    | 'DeleteDateColumn'
+    | 'VersionColumn';
+
 type ColumnTypeString = 'string' | 'number' | 'boolean' | 'Date' | 'unknown';
 
 interface ColumnType {
@@ -8,6 +17,13 @@ interface ColumnType {
     nullable: boolean;
     literal: boolean;
     array: boolean;
+}
+
+interface ColumnParameter {
+    type?: string;
+    nullable?: boolean;
+    transformer?: object;
+    array?: boolean;
 }
 
 // From: https://github.com/typeorm/typeorm/blob/master/src/driver/types/ColumnTypes.ts
@@ -57,6 +73,7 @@ const stringLike = [
     'shorttext',
     'string',
     'text',
+    'uuid',
 ];
 const dateLike = [
     'date',
@@ -97,37 +114,43 @@ function convertTypeOrmToColumnType(arg: string): ColumnTypeString {
     return 'unknown';
 }
 
-export function convertArgumentToColumnType(args: TSESTree.CallExpressionArgument[]): ColumnType {
-    const parsed = args.reduce(
-        (prev, arg) => {
-            switch (arg.type) {
-                case AST_NODE_TYPES.ObjectExpression:
-                    return { ...prev, ...parseObjectLiteral(arg) };
-                case AST_NODE_TYPES.Literal:
-                    if (typeof arg.value === 'string') {
-                        return { ...prev, type: arg.value };
-                    }
-                default:
-                    return prev;
-            }
-        },
-        {} as {
-            type?: string;
-            nullable?: boolean;
-            transformer?: object;
-            array?: boolean;
-        },
-    );
-    if (!parsed.type || parsed.transformer) {
-        return {
-            columnType: 'unknown',
-            nullable: parsed.nullable ?? false,
-            literal: false,
-            array: parsed.array ?? false,
-        };
+export function getDefaultColumnTypeForDecorator(column: Column): ColumnParameter {
+    switch (column) {
+        case 'PrimaryColumn':
+        case 'PrimaryGeneratedColumn':
+        case 'VersionColumn':
+            return { type: 'integer', nullable: false };
+        case 'CreateDateColumn':
+            return { type: 'datetime', nullable: false };
+        case 'DeleteDateColumn':
+            return { type: 'datetime', nullable: true };
+        case 'Column':
+        default:
+            return {};
     }
+}
+
+export function convertArgumentToColumnType(
+    column: Column,
+    args: TSESTree.CallExpressionArgument[],
+): ColumnType {
+    const parsed = args.reduce((prev, arg) => {
+        switch (arg.type) {
+            case AST_NODE_TYPES.ObjectExpression:
+                return { ...prev, ...parseObjectLiteral(arg) };
+            case AST_NODE_TYPES.Literal:
+                if (typeof arg.value === 'string') {
+                    return { ...prev, type: arg.value };
+                }
+            default:
+                return prev;
+        }
+    }, getDefaultColumnTypeForDecorator(column));
     return {
-        columnType: convertTypeOrmToColumnType(parsed.type),
+        columnType:
+            parsed.type && !parsed.transformer
+                ? convertTypeOrmToColumnType(parsed.type)
+                : 'unknown',
         nullable: parsed.nullable ?? false,
         literal: false,
         array: parsed.array ?? false,

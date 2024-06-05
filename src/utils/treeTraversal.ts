@@ -19,6 +19,19 @@ export function findDecoratorArguments(
     );
 }
 
+export function findEitherDecoratorArguments<T extends string>(
+    decorators: TSESTree.Decorator[] | undefined,
+    relationTypes: T[],
+): [T, TSESTree.CallExpressionArgument[]] | undefined {
+    for (const relation of relationTypes) {
+        const relationArguments = findDecoratorArguments(decorators, relation);
+        if (relationArguments) {
+            return [relation, relationArguments];
+        }
+    }
+    return undefined;
+}
+
 export function findParentClass(
     node: TSESTree.PropertyDefinition,
 ): TSESTree.ClassDeclaration | undefined {

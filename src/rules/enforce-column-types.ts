@@ -5,7 +5,11 @@ import {
     isTypesEqual,
     typeToString,
 } from '../utils/columnType';
-import { findDecoratorArguments, findParentClass } from '../utils/treeTraversal';
+import {
+    findDecoratorArguments,
+    findEitherDecoratorArguments,
+    findParentClass,
+} from '../utils/treeTraversal';
 
 const createRule = ESLintUtils.RuleCreator(
     (name) =>
@@ -33,12 +37,21 @@ const enforceColumnTypes = createRule({
     create(context) {
         return {
             PropertyDefinition(node) {
-                const columnArguments = findDecoratorArguments(node.decorators, 'Column');
+                const columnArguments = findEitherDecoratorArguments(node.decorators, [
+                    'Column',
+                    'PrimaryColumn',
+                    'PrimaryGeneratedColumn',
+                    'CreateDateColumn',
+                    'UpdateDateColumn',
+                    'DeleteDateColumn',
+                    'VersionColumn',
+                ]);
                 if (!columnArguments || !node.typeAnnotation) {
                     return;
                 }
 
-                const typeormType = convertArgumentToColumnType(columnArguments);
+                const [column, colArguments] = columnArguments;
+                const typeormType = convertArgumentToColumnType(column, colArguments);
                 const { typeAnnotation } = node.typeAnnotation;
                 const typescriptType = convertTypeToColumnType(typeAnnotation);
 

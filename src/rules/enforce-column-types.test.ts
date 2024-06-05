@@ -195,6 +195,76 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                 transformed: number;
             }`,
         },
+        {
+            name: 'should allow primary columns',
+            code: `class Entity {
+                @PrimaryColumn()
+                id: number;
+            }`,
+        },
+        {
+            name: 'should allow generated primary columns',
+            code: `class Entity {
+                @PrimaryGeneratedColumn()
+                idGenerated: number;
+            }`,
+        },
+        {
+            name: 'should allow uuid primary columns',
+            code: `class Entity {
+                @PrimaryGeneratedColumn('uuid')
+                uuid: string;
+            }`,
+        },
+        {
+            name: 'should allow version columns',
+            code: `class Entity {
+                @VersionColumn()
+                version: number;
+            }`,
+        },
+        {
+            name: 'should allow created date string columns',
+            code: `class Entity {
+                @CreateDateColumn()
+                createdAt: string;
+            }`,
+        },
+        {
+            name: 'should allow created date date columns',
+            code: `class Entity {
+                @CreateDateColumn()
+                createdAtDate: Date;
+            }`,
+        },
+        {
+            name: 'should allow updated date string columns',
+            code: `class Entity {
+                @UpdateDateColumn()
+                updatedAt: string;
+            }`,
+        },
+        {
+            name: 'should allow updated date date columns',
+            code: `class Entity {
+                @UpdateDateColumn()
+                updatedAtDate: Date;
+            }`,
+        },
+        {
+            name: 'should allow deleted date string columns',
+            code: `class Entity {
+                @DeleteDateColumn()
+                deletedAt: string | null;
+            }`,
+        },
+        {
+            name: 'should allow deleted date date columns',
+            code: `class Entity {
+                @DeleteDateColumn()
+                deletedAtDate: Date | null;
+            }`,
+        },
     ],
     invalid: [
         {
@@ -435,6 +505,132 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                             output: `class Entity {
                 @Column()
                 empty: string;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-number id type',
+            code: `class Entity {
+                @PrimaryGeneratedColumn()
+                id: string;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @PrimaryGeneratedColumn()
+                id: number;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-string uuid type',
+            code: `class Entity {
+                @PrimaryGeneratedColumn('uuid')
+                id: number;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @PrimaryGeneratedColumn('uuid')
+                id: string;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on nullable id type',
+            code: `class Entity {
+                @PrimaryGeneratedColumn()
+                id: number | null;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @PrimaryGeneratedColumn()
+                id: number;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on nullable create date type',
+            code: `class Entity {
+                @CreateDateColumn()
+                createdAt: Date | null;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @CreateDateColumn()
+                createdAt: Date;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on nullable update date type',
+            code: `class Entity {
+                @UpdateDateColumn()
+                updatedAt: Date | null;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @UpdateDateColumn()
+                updatedAt: Date;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-nullable delete date type',
+            code: `class Entity {
+                @DeleteDateColumn()
+                deletedAt: Date;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @DeleteDateColumn()
+                deletedAt: Date | null;
             }`,
                         },
                     ],

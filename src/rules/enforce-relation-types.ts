@@ -1,15 +1,13 @@
 import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
 import { ReportSuggestionArray } from '@typescript-eslint/utils/ts-eslint';
 import {
-    findDecoratorArguments,
+    findEitherDecoratorArguments,
     findObjectArgument,
     findParentClass,
 } from '../utils/treeTraversal';
 import {
     convertArgumentToRelationType,
     convertTypeToRelationType,
-    Relation,
-    relationTypes,
     isTypesEqual,
     typeToString,
     isTypeMissingNullable,
@@ -55,13 +53,12 @@ const enforceColumnTypes = createRule({
     create(context) {
         return {
             PropertyDefinition(node) {
-                const relationsArguments = relationTypes.map(
-                    (relation): [Relation, TSESTree.CallExpressionArgument[] | undefined] => [
-                        relation,
-                        findDecoratorArguments(node.decorators, relation),
-                    ],
-                );
-                const relationArguments = relationsArguments.find(([, args]) => args);
+                const relationArguments = findEitherDecoratorArguments(node.decorators, [
+                    'OneToOne',
+                    'OneToMany',
+                    'ManyToOne',
+                    'ManyToMany',
+                ]);
                 if (!relationArguments) {
                     return;
                 }
