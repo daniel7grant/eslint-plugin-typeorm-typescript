@@ -36,6 +36,9 @@ TypeORM data types and TypeScript types should be consistent. It includes the pr
 and the nullability. By default columns are non-nullable, but if the `nullable: true` option is set, it should be unioned
 with `null` in the TypeScript types too.
 
+It also handle primary columns (`number` by default), create and update columns (`date` by default) and delete columns
+(`date` and nullable by default).
+
 #### Configuration
 
 ```json
@@ -59,6 +62,10 @@ class Entity {
     // Should be string | null
     @Column({ type: "varchar", nullable: true })
     name: string;
+
+    // Should be Date | null
+    @DeleteDateColumn()
+    deletedAt: Date;
 }
 ```
 
