@@ -1,5 +1,13 @@
 import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils';
 import { parseObjectLiteral } from './treeTraversal';
+import {
+    ArrayTypeNode,
+    LiteralTypeNode,
+    SyntaxKind,
+    TypeNode,
+    UnionTypeNode,
+    isTypeReferenceNode,
+} from 'typescript';
 
 type Column =
     | 'Column'
@@ -12,7 +20,7 @@ type Column =
 
 type ColumnTypeString = 'string' | 'number' | 'boolean' | 'Date' | 'unknown';
 
-interface ColumnType {
+export interface ColumnType {
     columnType: ColumnTypeString;
     nullable: boolean;
     literal: boolean;
@@ -157,6 +165,71 @@ export function convertArgumentToColumnType(
     };
 }
 
+export function convertTsTypeToColumnType(arg: TypeNode): ColumnType {
+    switch (arg.kind) {
+        case SyntaxKind.StringKeyword:
+            return { columnType: 'string', nullable: false, literal: false, array: false };
+
+        case SyntaxKind.NumberKeyword:
+        case SyntaxKind.BigIntKeyword:
+            return { columnType: 'number', nullable: false, literal: false, array: false };
+
+        case SyntaxKind.BooleanKeyword:
+            return { columnType: 'boolean', nullable: false, literal: false, array: false };
+
+        case SyntaxKind.TypeReference:
+            if (isTypeReferenceNode(arg) && arg.typeName.escapedText === 'Date') {
+                return { columnType: 'Date', nullable: false, literal: false, array: false };
+            }
+            break;
+
+        case SyntaxKind.LiteralType:
+            const literal = arg as LiteralTypeNode;
+            switch (literal.literal.kind) {
+                case SyntaxKind.NullKeyword:
+                    return { columnType: 'unknown', nullable: true, literal: false, array: false };
+
+                case SyntaxKind.StringLiteral:
+                    return { columnType: 'string', nullable: false, literal: true, array: false };
+
+                case SyntaxKind.NumericLiteral:
+                    return { columnType: 'number', nullable: false, literal: true, array: false };
+
+                case SyntaxKind.TrueKeyword:
+                case SyntaxKind.FalseKeyword:
+                    return { columnType: 'boolean', nullable: false, literal: true, array: false };
+            }
+            break;
+
+        case SyntaxKind.ArrayType:
+            const array = arg as ArrayTypeNode;
+            const item = convertTsTypeToColumnType(array.elementType);
+            return { ...item, array: true };
+
+        case SyntaxKind.UnionType:
+            const union = arg as UnionTypeNode;
+            return union.types.reduce<ColumnType>(
+                (acc, currentType) => {
+                    const current = convertTsTypeToColumnType(currentType);
+                    return {
+                        columnType:
+                            current.columnType !== 'unknown' ? current.columnType : acc.columnType,
+                        nullable: current.nullable || acc.nullable,
+                        literal: current.literal || acc.literal,
+                        array: current.array || acc.array,
+                    };
+                },
+                {
+                    columnType: 'unknown',
+                    nullable: false,
+                    literal: false,
+                    array: false,
+                },
+            );
+    }
+    return { columnType: 'unknown', nullable: false, literal: false, array: false };
+}
+
 export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
     switch (arg.type) {
         case AST_NODE_TYPES.TSStringKeyword:
@@ -224,10 +297,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
 
         case AST_NODE_TYPES.TSArrayType: {
             const item = convertTypeToColumnType(arg.elementType);
-            if (item) {
-                return { ...item, array: true };
-            }
-            return item;
+            return { ...item, array: true };
         }
 
         // TODO: handles these types too

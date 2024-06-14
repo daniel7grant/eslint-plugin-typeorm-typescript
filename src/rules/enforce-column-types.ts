@@ -1,6 +1,12 @@
-import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
 import {
+    AST_NODE_TYPES,
+    ESLintUtils,
+    ParserServicesWithTypeInformation,
+} from '@typescript-eslint/utils';
+import {
+    ColumnType,
     convertArgumentToColumnType,
+    convertTsTypeToColumnType,
     convertTypeToColumnType,
     isTypesEqual,
     typeToString,
@@ -10,6 +16,7 @@ import {
     findEitherDecoratorArguments,
     findParentClass,
 } from '../utils/treeTraversal';
+import { NodeBuilderFlags, TypeChecker, TypeNode } from 'typescript';
 
 const createRule = ESLintUtils.RuleCreator(
     (name) =>
@@ -49,11 +56,32 @@ const enforceColumnTypes = createRule({
                 if (!columnArguments || !node.typeAnnotation) {
                     return;
                 }
-
                 const [column, colArguments] = columnArguments;
                 const typeormType = convertArgumentToColumnType(column, colArguments);
-                const { typeAnnotation } = node.typeAnnotation;
-                const typescriptType = convertTypeToColumnType(typeAnnotation);
+
+                const typeAnnotation = node.typeAnnotation.typeAnnotation;
+                let typescriptType: ColumnType;
+                let services: ParserServicesWithTypeInformation | undefined;
+                let checker: TypeChecker | undefined;
+                try {
+                    services = ESLintUtils.getParserServices(context);
+                    checker = services.program.getTypeChecker();
+                } catch {
+                    // No typechecker found, continue with typeless
+                }
+
+                if (services && checker) {
+                    const type = services.getTypeAtLocation(node);
+                    const typeNode = checker.typeToTypeNode(type, undefined, NodeBuilderFlags.None);
+
+                    if (typeNode) {
+                        typescriptType = convertTsTypeToColumnType(typeNode);
+                    } else {
+                        typescriptType = convertTypeToColumnType(typeAnnotation);
+                    }
+                } else {
+                    typescriptType = convertTypeToColumnType(typeAnnotation);
+                }
 
                 if (!isTypesEqual(typeormType, typescriptType)) {
                     const fixReplace = typeToString(typeormType, typescriptType);
