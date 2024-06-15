@@ -10,10 +10,15 @@
     - Primary column decorators `PrimaryColumn`, `PrimaryGeneratedColumn` is number by default,
     - Date column decorators `CreateDateColumn`, `UpdateDateColumn` is date by default, `DeleteDateColumn` is nullable,
     - Version column decorator `VersionColumn` is number.
+- Add support for [Typed Rules](https://typescript-eslint.io/getting-started/typed-linting) on Column types
+    - This allows to resolve referenced types (e.g. type aliases) in TypeScript types
 
 ### Changed
 
 - Fix issue when empty Column type doesn't get report nullability errors
+- Upgrade packages
+    - Upgrade TypeScript-ESLint from v6 to v7
+    - Remove AirBNB ESLint configuration
 
 ## [0.2.6] - 2024-05-31
 
