@@ -10,6 +10,7 @@
     - Primary column decorators `PrimaryColumn`, `PrimaryGeneratedColumn` is number by default,
     - Date column decorators `CreateDateColumn`, `UpdateDateColumn` is date by default, `DeleteDateColumn` is nullable,
     - Version column decorator `VersionColumn` is number.
+- Allow lazy relations with `Promise<Relation>` ([#10](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/10))
 
 ### Changed
 

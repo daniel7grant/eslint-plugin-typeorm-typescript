@@ -65,6 +65,9 @@ const enforceColumnTypes = createRule({
 
                 const [relation, relArguments] = relationArguments;
                 const typeormType = convertArgumentToRelationType(relation, relArguments);
+                if (!typeormType) {
+                    return; // TODO: report error
+                }
 
                 if (!node.typeAnnotation) {
                     return;
@@ -75,7 +78,7 @@ const enforceColumnTypes = createRule({
                 if (!isTypesEqual(typeormType, typescriptType)) {
                     let messageId: EnforceColumnMessages = 'typescript_typeorm_relation_mismatch';
                     const suggestions: ReportSuggestionArray<EnforceColumnMessages> = [];
-                    const fixReplace = typeToString(typeormType);
+                    const fixReplace = typeToString(typeormType, typescriptType);
 
                     // Construct strings for error message
                     const propertyName =
