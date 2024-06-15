@@ -170,6 +170,7 @@ export function convertArgumentToColumnType(
 
 export function convertTsTypeToColumnType(arg: TypeNode, checker: TypeChecker): ColumnType {
     switch (arg.kind) {
+        case SyntaxKind.TemplateLiteralType:
         case SyntaxKind.StringKeyword:
             return { columnType: 'string', nullable: false, literal: false, array: false };
 

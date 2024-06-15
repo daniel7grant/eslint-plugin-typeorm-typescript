@@ -166,7 +166,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
-            name: 'should ignore reference types',
+            name: 'should allow reference types',
             code: `type JsonObject = {};
             class Entity {
                 @Column({ type: 'json' })
@@ -186,6 +186,31 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             code: `class Entity {
                 @Column({ type: 'text', transformer: { from() {}, to() {} } })
                 transformed: number;
+            }`,
+        },
+        {
+            name: 'should resolve string reference types',
+            code: `type UUID = string;
+            class Entity {
+                @Column({ type: 'string' })
+                reference: UUID;
+            }`,
+        },
+        {
+            name: 'should resolve template reference types',
+            code:
+                'type UUID = `${string}-${string}-${string}-${string}-${string}`;\n' +
+                'class Entity {\n' +
+                '    @Column({ type: "string" })\n' +
+                '    reference: UUID;\n' +
+                '}',
+        },
+        {
+            name: 'should resolve number reference types',
+            code: `type Byte = number;
+            class Entity {
+                @Column({ type: 'number' })
+                reference: Byte;
             }`,
         },
         {
@@ -472,7 +497,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             ],
         },
         {
-            name: 'should fail on unknown TypeORM type',
+            name: 'should fail on nullable unknown TypeORM type',
             code: `class Entity {
                 @Column({ nullable: true })
                 something: string;
@@ -486,6 +511,29 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                             output: `class Entity {
                 @Column({ nullable: true })
                 something: string | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on resolved types',
+            code: `type UUID = string;
+            class Entity {
+                @Column({ type: 'number' })
+                str: UUID;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `type UUID = string;
+            class Entity {
+                @Column({ type: 'number' })
+                str: number;
             }`,
                         },
                     ],
