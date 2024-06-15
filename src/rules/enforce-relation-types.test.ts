@@ -138,6 +138,19 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
         {
             name: 'should fail on nullable one-to-one relations',
             code: `class Entity {
+                @OneToOne()
+                @JoinColumn()
+                other: Other;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_missing',
+                },
+            ],
+        },
+        {
+            name: 'should fail on nullable one-to-one relations',
+            code: `class Entity {
                 @OneToOne(() => Other)
                 @JoinColumn()
                 other: Other;
