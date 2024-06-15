@@ -1,13 +1,14 @@
 import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils';
-import { parseObjectLiteral } from './treeTraversal';
 import {
     ArrayTypeNode,
     LiteralTypeNode,
     SyntaxKind,
+    TypeChecker,
     TypeNode,
     UnionTypeNode,
     isTypeReferenceNode,
 } from 'typescript';
+import { parseObjectLiteral } from './treeTraversal';
 
 type Column =
     | 'Column'
@@ -129,6 +130,7 @@ export function getDefaultColumnTypeForDecorator(column: Column): ColumnParamete
         case 'VersionColumn':
             return { type: 'integer', nullable: false };
         case 'CreateDateColumn':
+        case 'UpdateDateColumn':
             return { type: 'datetime', nullable: false };
         case 'DeleteDateColumn':
             return { type: 'datetime', nullable: true };
@@ -150,6 +152,7 @@ export function convertArgumentToColumnType(
                 if (typeof arg.value === 'string') {
                     return { ...prev, type: arg.value };
                 }
+                return prev;
             default:
                 return prev;
         }
@@ -165,7 +168,7 @@ export function convertArgumentToColumnType(
     };
 }
 
-export function convertTsTypeToColumnType(arg: TypeNode): ColumnType {
+export function convertTsTypeToColumnType(arg: TypeNode, checker: TypeChecker): ColumnType {
     switch (arg.kind) {
         case SyntaxKind.StringKeyword:
             return { columnType: 'string', nullable: false, literal: false, array: false };
@@ -178,12 +181,15 @@ export function convertTsTypeToColumnType(arg: TypeNode): ColumnType {
             return { columnType: 'boolean', nullable: false, literal: false, array: false };
 
         case SyntaxKind.TypeReference:
-            if (isTypeReferenceNode(arg) && arg.typeName.escapedText === 'Date') {
-                return { columnType: 'Date', nullable: false, literal: false, array: false };
+            if (isTypeReferenceNode(arg)) {
+                const symbol = checker.getTypeAtLocation(arg.typeName).getSymbol();
+                if (symbol?.getName() === 'Date') {
+                    return { columnType: 'Date', nullable: false, literal: false, array: false };
+                }
             }
             break;
 
-        case SyntaxKind.LiteralType:
+        case SyntaxKind.LiteralType: {
             const literal = arg as LiteralTypeNode;
             switch (literal.literal.kind) {
                 case SyntaxKind.NullKeyword:
@@ -198,19 +204,24 @@ export function convertTsTypeToColumnType(arg: TypeNode): ColumnType {
                 case SyntaxKind.TrueKeyword:
                 case SyntaxKind.FalseKeyword:
                     return { columnType: 'boolean', nullable: false, literal: true, array: false };
+
+                default:
+                    break;
             }
             break;
+        }
 
-        case SyntaxKind.ArrayType:
+        case SyntaxKind.ArrayType: {
             const array = arg as ArrayTypeNode;
-            const item = convertTsTypeToColumnType(array.elementType);
+            const item = convertTsTypeToColumnType(array.elementType, checker);
             return { ...item, array: true };
+        }
 
-        case SyntaxKind.UnionType:
+        case SyntaxKind.UnionType: {
             const union = arg as UnionTypeNode;
             return union.types.reduce<ColumnType>(
                 (acc, currentType) => {
-                    const current = convertTsTypeToColumnType(currentType);
+                    const current = convertTsTypeToColumnType(currentType, checker);
                     return {
                         columnType:
                             current.columnType !== 'unknown' ? current.columnType : acc.columnType,
@@ -226,6 +237,9 @@ export function convertTsTypeToColumnType(arg: TypeNode): ColumnType {
                     array: false,
                 },
             );
+        }
+        default:
+            return { columnType: 'unknown', nullable: false, literal: false, array: false };
     }
     return { columnType: 'unknown', nullable: false, literal: false, array: false };
 }

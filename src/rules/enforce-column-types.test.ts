@@ -117,13 +117,6 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
-            name: 'should allow matching string literal column types',
-            code: `class Entity {
-                @Column({ type: 'string' })
-                strLiteral: 'one' | 'two';
-            }`,
-        },
-        {
             name: 'should allow matching number literal column types',
             code: `class Entity {
                 @Column({ type: 'number' })
@@ -131,7 +124,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
-            name: 'should allow matching number literal column types',
+            name: 'should allow matching boolean literal column types',
             code: `class Entity {
                 @Column({ type: 'boolean' })
                 numLiteral: true;

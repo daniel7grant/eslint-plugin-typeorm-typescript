@@ -1,3 +1,4 @@
+import { NodeBuilderFlags, TypeChecker } from 'typescript';
 import {
     AST_NODE_TYPES,
     ESLintUtils,
@@ -11,12 +12,7 @@ import {
     isTypesEqual,
     typeToString,
 } from '../utils/columnType';
-import {
-    findDecoratorArguments,
-    findEitherDecoratorArguments,
-    findParentClass,
-} from '../utils/treeTraversal';
-import { NodeBuilderFlags, TypeChecker, TypeNode } from 'typescript';
+import { findEitherDecoratorArguments, findParentClass } from '../utils/treeTraversal';
 
 const createRule = ESLintUtils.RuleCreator(
     (name) =>
@@ -59,7 +55,7 @@ const enforceColumnTypes = createRule({
                 const [column, colArguments] = columnArguments;
                 const typeormType = convertArgumentToColumnType(column, colArguments);
 
-                const typeAnnotation = node.typeAnnotation.typeAnnotation;
+                const { typeAnnotation } = node.typeAnnotation;
                 let typescriptType: ColumnType;
                 let services: ParserServicesWithTypeInformation | undefined;
                 let checker: TypeChecker | undefined;
@@ -75,7 +71,7 @@ const enforceColumnTypes = createRule({
                     const typeNode = checker.typeToTypeNode(type, undefined, NodeBuilderFlags.None);
 
                     if (typeNode) {
-                        typescriptType = convertTsTypeToColumnType(typeNode);
+                        typescriptType = convertTsTypeToColumnType(typeNode, checker);
                     } else {
                         typescriptType = convertTypeToColumnType(typeAnnotation);
                     }

@@ -23,6 +23,7 @@ export function findEitherDecoratorArguments<T extends string>(
     decorators: TSESTree.Decorator[] | undefined,
     relationTypes: T[],
 ): [T, TSESTree.CallExpressionArgument[]] | undefined {
+    // eslint-disable-next-line no-restricted-syntax
     for (const relation of relationTypes) {
         const relationArguments = findDecoratorArguments(decorators, relation);
         if (relationArguments) {
@@ -73,10 +74,9 @@ export function parseObjectLiteral(
                 ) {
                     if (prop.value.type === AST_NODE_TYPES.Literal) {
                         return { ...parsedObject, [prop.key.name]: prop.value.value };
-                    } else {
-                        // Handle unknown values as object for transformer
-                        return { ...parsedObject, [prop.key.name]: {} };
                     }
+                    // Handle unknown values as object for transformer
+                    return { ...parsedObject, [prop.key.name]: {} };
                 }
                 return parsedObject;
             },
