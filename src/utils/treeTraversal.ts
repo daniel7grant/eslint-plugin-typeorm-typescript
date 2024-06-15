@@ -23,7 +23,6 @@ export function findEitherDecoratorArguments<T extends string>(
     decorators: TSESTree.Decorator[] | undefined,
     relationTypes: T[],
 ): [T, TSESTree.CallExpressionArgument[]] | undefined {
-    // eslint-disable-next-line no-restricted-syntax
     for (const relation of relationTypes) {
         const relationArguments = findDecoratorArguments(decorators, relation);
         if (relationArguments) {
