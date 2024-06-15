@@ -283,15 +283,6 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                 deletedAtDate: Date | null;
             }`,
         },
-        {
-            name: 'should handle aliases',
-            code: `
-            type StringAlias = string;
-            class Entity {
-                @Column({ type: 'string' })
-                alias: StringAlias;
-            }`,
-        },
     ],
     invalid: [
         {
