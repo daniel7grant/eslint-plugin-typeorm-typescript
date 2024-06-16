@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import enforceColumnTypes from './rules/enforce-column-types';
 import enforceConsistentNullability from './rules/enforce-consistent-nullability';
 import enforceRelationTypes from './rules/enforce-relation-types';

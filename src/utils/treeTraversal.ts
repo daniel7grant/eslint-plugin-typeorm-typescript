@@ -73,10 +73,9 @@ export function parseObjectLiteral(
                 ) {
                     if (prop.value.type === AST_NODE_TYPES.Literal) {
                         return { ...parsedObject, [prop.key.name]: prop.value.value };
-                    } else {
-                        // Handle unknown values as object for transformer
-                        return { ...parsedObject, [prop.key.name]: {} };
                     }
+                    // Handle unknown values as object for transformer
+                    return { ...parsedObject, [prop.key.name]: {} };
                 }
                 return parsedObject;
             },

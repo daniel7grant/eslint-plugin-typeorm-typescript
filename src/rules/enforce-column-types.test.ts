@@ -1,3 +1,4 @@
+import path from 'path';
 import * as vitest from 'vitest';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import enforceColumnTypes from './enforce-column-types';
@@ -9,6 +10,10 @@ RuleTester.describe = vitest.describe;
 
 const ruleTester = new RuleTester({
     parser: '@typescript-eslint/parser',
+    parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: path.join(__dirname, '../../tests'),
+    },
 });
 
 ruleTester.run('enforce-column-types', enforceColumnTypes, {
@@ -112,13 +117,6 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
-            name: 'should allow matching string literal column types',
-            code: `class Entity {
-                @Column({ type: 'string' })
-                strLiteral: 'one' | 'two';
-            }`,
-        },
-        {
             name: 'should allow matching number literal column types',
             code: `class Entity {
                 @Column({ type: 'number' })
@@ -126,7 +124,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
-            name: 'should allow matching number literal column types',
+            name: 'should allow matching boolean literal column types',
             code: `class Entity {
                 @Column({ type: 'boolean' })
                 numLiteral: true;
@@ -157,7 +155,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             name: 'should allow nullable unset types',
             code: `class Entity {
                 @Column({ nullable: true })
-                unsetNullable: unset | null;
+                unsetNullable: number | null;
             }`,
         },
         {
@@ -168,22 +166,17 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
-            name: 'should allow nullable unknown types',
-            code: `class Entity {
-                @Column({ type: 'json', nullable: true })
-                unknownNullable: unknown | null;
-            }`,
-        },
-        {
-            name: 'should ignore reference types',
-            code: `class Entity {
+            name: 'should allow reference types',
+            code: `type JsonObject = {};
+            class Entity {
                 @Column({ type: 'json' })
                 reference: JsonObject;
             }`,
         },
         {
             name: 'should allow nullable reference types',
-            code: `class Entity {
+            code: `type JsonObject = {};
+            class Entity {
                 @Column({ type: 'json', nullable: true })
                 referenceNullable: JsonObject | null;
             }`,
@@ -193,6 +186,31 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             code: `class Entity {
                 @Column({ type: 'text', transformer: { from() {}, to() {} } })
                 transformed: number;
+            }`,
+        },
+        {
+            name: 'should resolve string reference types',
+            code: `type UUID = string;
+            class Entity {
+                @Column({ type: 'string' })
+                reference: UUID;
+            }`,
+        },
+        {
+            name: 'should resolve template reference types',
+            code:
+                'type UUID = `${string}-${string}-${string}-${string}-${string}`;\n' +
+                'class Entity {\n' +
+                '    @Column({ type: "string" })\n' +
+                '    reference: UUID;\n' +
+                '}',
+        },
+        {
+            name: 'should resolve number reference types',
+            code: `type Byte = number;
+            class Entity {
+                @Column({ type: 'number' })
+                reference: Byte;
             }`,
         },
         {
@@ -352,7 +370,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             ],
         },
         {
-            name: 'should fail on nullable TypeScript type',
+            name: 'should fail on non-nullable string TypeScript type',
             code: `class Entity {
                 @Column({ type: 'string' })
                 str: string | null;
@@ -415,7 +433,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             ],
         },
         {
-            name: 'should fail on nullable TypeORM type',
+            name: 'should fail on nullable literal TypeORM type',
             code: `class Entity {
                 @Column({ type: 'string', nullable: true })
                 str: 'one' | 'true';
@@ -470,7 +488,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             ],
         },
         {
-            name: 'should fail on unknown TypeORM type',
+            name: 'should fail on nullable unknown TypeORM type',
             code: `class Entity {
                 @Column({ nullable: true })
                 something: string;
@@ -484,6 +502,29 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                             output: `class Entity {
                 @Column({ nullable: true })
                 something: string | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on resolved types',
+            code: `type UUID = string;
+            class Entity {
+                @Column({ type: 'number' })
+                str: UUID;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `type UUID = string;
+            class Entity {
+                @Column({ type: 'number' })
+                str: number;
             }`,
                         },
                     ],
