@@ -19,7 +19,8 @@ Update `.eslintrc.json` with the plugin to the `plugins` key, and add it to the 
   "plugins": ["typeorm-typescript"],
   "rules": {
     "typeorm-typescript/enforce-column-types": "error",
-    "typeorm-typescript/enforce-relation-types": "error"
+    "typeorm-typescript/enforce-relation-types": "error",
+    "typeorm-typescript/enforce-consistent-nullability": "error"
   }
 }
 ```
@@ -162,13 +163,13 @@ that either only the non-default value is set (default behaviour) or the nullabl
 {
     "rules": {
         // If you want to report an error for unnecessary nullables
-        "typeorm-typescript/enforce-relation-types": "error", // or
-        "typeorm-typescript/enforce-relation-types": [
+        "typeorm-typescript/enforce-consistent-nullability": "error", // or
+        "typeorm-typescript/enforce-consistent-nullability": [
             "error",
             { "specifyNullable": "non-default" },
         ],
         // If you want to force setting nullable everywhere to avoid confusion
-        "typeorm-typescript/enforce-relation-types": ["error", { "specifyNullable": "always" }],
+        "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "always" }],
     },
 }
 ```
