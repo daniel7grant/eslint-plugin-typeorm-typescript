@@ -82,19 +82,75 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             options: [{ specifyNullable: 'always' }],
             errors: [
                 {
-                    messageId: 'typescript_typeorm_must_nullability',
-                    //         suggestions: [
-                    //             {
-                    //                 messageId: 'typescript_typeorm_must_nullability',
-                    //                 output: `class Entity {
-                    //     @Column({ type: 'string', nullable: false })
-                    //     str: string;
+                    messageId: 'typescript_typeorm_missing_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_set_nullable',
+                            output: `class Entity {
+                @Column({ type: 'string', nullable: false })
+                str: string;
 
-                    //     @Column({ type: 'string', nullable: true })
-                    //     str: string | null;
-                    // }`,
-                    //             },
-                    //         ],
+                @Column({ type: 'string', nullable: true })
+                str: string | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail undefined string nullable if the nullability is always',
+            code: `class Entity {
+                @Column('string', {})
+                str: string;
+
+                @Column('string', { nullable: true })
+                str: string | null;
+            }`,
+            options: [{ specifyNullable: 'always' }],
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_missing_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_set_nullable',
+                            output: `class Entity {
+                @Column('string', { nullable: false })
+                str: string;
+
+                @Column('string', { nullable: true })
+                str: string | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail undefined unset nullable if the nullability is always',
+            code: `class Entity {
+                @Column()
+                str: string;
+
+                @Column({ nullable: true })
+                str: string | null;
+            }`,
+            options: [{ specifyNullable: 'always' }],
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_missing_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_set_nullable',
+                            output: `class Entity {
+                @Column({ nullable: false })
+                str: string;
+
+                @Column({ nullable: true })
+                str: string | null;
+            }`,
+                        },
+                    ],
                 },
             ],
         },
@@ -110,19 +166,103 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             options: [{ specifyNullable: 'only-nullable' }],
             errors: [
                 {
-                    messageId: 'typescript_typeorm_must_nullability',
-                    //         suggestions: [
-                    //             {
-                    //                 messageId: 'typescript_typeorm_must_nullability',
-                    //                 output: `class Entity {
-                    //     @Column({ type: 'string' })
-                    //     str: string;
+                    messageId: 'typescript_typeorm_superfluous_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_remove_nullable',
+                            output: `class Entity {
+                @Column({ type: 'string' })
+                str: string;
 
-                    //     @Column({ type: 'string', nullable: true })
-                    //     str: string | null;
-                    // }`,
-                    //             },
-                    //         ],
+                @Column({ type: 'string', nullable: true })
+                str: string | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail given unordered column nullable if the nullability is only-nullable',
+            code: `class Entity {
+                @Column({ nullable: false, type: 'string' })
+                str: string;
+
+                @Column({ nullable: true, type: 'string' })
+                str: string | null;
+            }`,
+            options: [{ specifyNullable: 'only-nullable' }],
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_superfluous_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_remove_nullable',
+                            output: `class Entity {
+                @Column({ type: 'string' })
+                str: string;
+
+                @Column({ nullable: true, type: 'string' })
+                str: string | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail given string column nullable if the nullability is only-nullable',
+            code: `class Entity {
+                @Column('string', { nullable: false })
+                str: string;
+
+                @Column('string', { nullable: true })
+                str: string | null;
+            }`,
+            options: [{ specifyNullable: 'only-nullable' }],
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_superfluous_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_remove_nullable',
+                            output: `class Entity {
+                @Column('string')
+                str: string;
+
+                @Column('string', { nullable: true })
+                str: string | null;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail given unknown column nullable if the nullability is only-nullable',
+            code: `class Entity {
+                @Column({ nullable: false })
+                str: string;
+
+                @Column({ nullable: true })
+                str: string | null;
+            }`,
+            options: [{ specifyNullable: 'only-nullable' }],
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_superfluous_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_remove_nullable',
+                            output: `class Entity {
+                @Column()
+                str: string;
+
+                @Column({ nullable: true })
+                str: string | null;
+            }`,
+                        },
+                    ],
                 },
             ],
         },
@@ -138,19 +278,19 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             options: [{ specifyNullable: 'always' }],
             errors: [
                 {
-                    messageId: 'typescript_typeorm_must_nullability',
-                    //         suggestions: [
-                    //             {
-                    //                 messageId: 'typescript_typeorm_must_nullability',
-                    //                 output: `class Entity {
-                    //     @ManyToOne(() => Other, { nullable: false })
-                    //     other: Other;
+                    messageId: 'typescript_typeorm_missing_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_set_nullable',
+                            output: `class Entity {
+                @ManyToOne(() => Other, { nullable: false })
+                other: Other;
 
-                    //     @ManyToOne(() => Other, { nullable: true })
-                    //     other: Other | null;
-                    // }`,
-                    //             },
-                    //         ],
+                @ManyToOne(() => Other, { nullable: true })
+                other: Other | null;
+            }`,
+                        },
+                    ],
                 },
             ],
         },
@@ -166,19 +306,19 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             options: [{ specifyNullable: 'only-nullable' }],
             errors: [
                 {
-                    messageId: 'typescript_typeorm_must_nullability',
-                    //         suggestions: [
-                    //             {
-                    //                 messageId: 'typescript_typeorm_must_nullability',
-                    //                 output: `class Entity {
-                    //     @ManyToOne(() => Other, { nullable: false })
-                    //     other: Other;
+                    messageId: 'typescript_typeorm_superfluous_nullability',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_remove_nullable',
+                            output: `class Entity {
+                @ManyToOne(() => Other, { nullable: false })
+                other: Other;
 
-                    //     @ManyToOne(() => Other)
-                    //     other: Other | null;
-                    // }`,
-                    //             },
-                    //         ],
+                @ManyToOne(() => Other)
+                other: Other | null;
+            }`,
+                        },
+                    ],
                 },
             ],
         },
