@@ -10,7 +10,7 @@ type ErrorMessages =
     | 'typescript_typeorm_superfluous_nullability'
     | 'typescript_typeorm_set_nullable'
     | 'typescript_typeorm_remove_nullable';
-type SpecifyNullability = 'always' | 'only-nullable' | undefined;
+type SpecifyNullability = 'always' | 'non-default';
 type Options = [
     {
         specifyNullable: SpecifyNullability;
@@ -24,7 +24,7 @@ const createRule = ESLintUtils.RuleCreator(
 
 const enforceConsistentNullability = createRule<Options, ErrorMessages>({
     name: 'enforce-consistent-nullability',
-    defaultOptions: [{ specifyNullable: undefined }],
+    defaultOptions: [{ specifyNullable: 'non-default' }],
     meta: {
         type: 'problem',
         docs: {
@@ -48,7 +48,7 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
                 properties: {
                     specifyNullable: {
                         type: 'string',
-                        enum: ['always', 'only-nullable'],
+                        enum: ['always', 'non-default'],
                     },
                 },
                 additionalProperties: false,
@@ -58,10 +58,6 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
     create(context, [{ specifyNullable }]) {
         return {
             PropertyDefinition(node) {
-                if (!specifyNullable) {
-                    return;
-                }
-
                 const columnArguments = findEitherDecoratorArguments(node.decorators, [
                     'Column',
                     'PrimaryColumn',
@@ -87,7 +83,7 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
 
                 if (
                     (specifyNullable === 'always' && nullable === undefined) ||
-                    (specifyNullable === 'only-nullable' && nullable === defaultNullability)
+                    (specifyNullable === 'non-default' && nullable === defaultNullability)
                 ) {
                     // Construct strings for error message
                     const reportedNode = argumentNode ?? colArguments[0]?.parent ?? node;
@@ -160,7 +156,7 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
                                         );
                                     }
 
-                                    // specifyNullable === 'only-nullable', remove nullable property
+                                    // specifyNullable === 'non-default', remove nullable property
                                     // There is a properties object only with one property (remove whole object)
                                     if (argumentNode.properties.length === 1) {
                                         const index = colArguments.findIndex(

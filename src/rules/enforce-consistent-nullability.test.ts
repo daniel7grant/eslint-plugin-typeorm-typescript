@@ -14,17 +14,6 @@ const ruleTester = new RuleTester({
 ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
     valid: [
         {
-            name: 'should pass if the nullability is undefined',
-            code: `class Entity {
-                @Column({ type: 'string' })
-                str: string;
-
-                @Column({ type: 'string', nullable: true })
-                str: string | null;
-            }`,
-            options: [{ specifyNullable: undefined }],
-        },
-        {
             name: 'should check column nullable if the nullability is always',
             code: `class Entity {
                 @Column({ type: 'string', nullable: false })
@@ -36,7 +25,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             options: [{ specifyNullable: 'always' }],
         },
         {
-            name: 'should check column nullable if the nullability is only-nullable',
+            name: 'should check column nullable if the nullability is non-default',
             code: `class Entity {
                 @Column({ type: 'string' })
                 str: string;
@@ -44,7 +33,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
                 @Column({ type: 'string', nullable: true })
                 str: string | null;
             }`,
-            options: [{ specifyNullable: 'only-nullable' }],
+            options: [{ specifyNullable: 'non-default' }],
         },
         {
             name: 'should check relation nullable if the nullability is always',
@@ -58,7 +47,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             options: [{ specifyNullable: 'always' }],
         },
         {
-            name: 'should check relation nullable if the nullability is only-nullable',
+            name: 'should check relation nullable if the nullability is non-default',
             code: `class Entity {
                 @ManyToOne(() => Other, { nullable: false })
                 other: Other;
@@ -66,7 +55,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
                 @ManyToOne(() => Other)
                 other: Other | null;
             }`,
-            options: [{ specifyNullable: 'only-nullable' }],
+            options: [{ specifyNullable: 'non-default' }],
         },
     ],
     invalid: [
@@ -155,7 +144,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             ],
         },
         {
-            name: 'should fail given column nullable if the nullability is only-nullable',
+            name: 'should fail given column nullable if the nullability is non-default',
             code: `class Entity {
                 @Column({ type: 'string', nullable: false })
                 str: string;
@@ -163,7 +152,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
                 @Column({ type: 'string', nullable: true })
                 str: string | null;
             }`,
-            options: [{ specifyNullable: 'only-nullable' }],
+            options: [{ specifyNullable: 'non-default' }],
             errors: [
                 {
                     messageId: 'typescript_typeorm_superfluous_nullability',
@@ -183,7 +172,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             ],
         },
         {
-            name: 'should fail given unordered column nullable if the nullability is only-nullable',
+            name: 'should fail given unordered column nullable if the nullability is non-default',
             code: `class Entity {
                 @Column({ nullable: false, type: 'string' })
                 str: string;
@@ -191,7 +180,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
                 @Column({ nullable: true, type: 'string' })
                 str: string | null;
             }`,
-            options: [{ specifyNullable: 'only-nullable' }],
+            options: [{ specifyNullable: 'non-default' }],
             errors: [
                 {
                     messageId: 'typescript_typeorm_superfluous_nullability',
@@ -211,7 +200,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             ],
         },
         {
-            name: 'should fail given string column nullable if the nullability is only-nullable',
+            name: 'should fail given string column nullable if the nullability is non-default',
             code: `class Entity {
                 @Column('string', { nullable: false })
                 str: string;
@@ -219,7 +208,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
                 @Column('string', { nullable: true })
                 str: string | null;
             }`,
-            options: [{ specifyNullable: 'only-nullable' }],
+            options: [{ specifyNullable: 'non-default' }],
             errors: [
                 {
                     messageId: 'typescript_typeorm_superfluous_nullability',
@@ -239,7 +228,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             ],
         },
         {
-            name: 'should fail given unknown column nullable if the nullability is only-nullable',
+            name: 'should fail given unknown column nullable if the nullability is non-default',
             code: `class Entity {
                 @Column({ nullable: false })
                 str: string;
@@ -247,7 +236,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
                 @Column({ nullable: true })
                 str: string | null;
             }`,
-            options: [{ specifyNullable: 'only-nullable' }],
+            options: [{ specifyNullable: 'non-default' }],
             errors: [
                 {
                     messageId: 'typescript_typeorm_superfluous_nullability',
@@ -295,7 +284,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
             ],
         },
         {
-            name: 'should fail given relation nullable if the nullability is only-nullable',
+            name: 'should fail given relation nullable if the nullability is non-default',
             code: `class Entity {
                 @ManyToOne(() => Other, { nullable: false })
                 other: Other;
@@ -303,7 +292,7 @@ ruleTester.run('enforce-consistent-nullability', enforceConsistentNullability, {
                 @ManyToOne(() => Other, { nullable: true })
                 other: Other | null;
             }`,
-            options: [{ specifyNullable: 'only-nullable' }],
+            options: [{ specifyNullable: 'non-default' }],
             errors: [
                 {
                     messageId: 'typescript_typeorm_superfluous_nullability',

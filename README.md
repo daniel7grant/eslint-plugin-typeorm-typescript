@@ -149,3 +149,92 @@ class Entity {
     others: Other[];
 }
 ```
+
+### typeorm-typescript/enforce-consistent-nullability
+
+The main source of confusion with TypeORM decorators is that the `nullable` flag is different between columns and relations.
+It is further complicated by being able to set the default value in some places and omit from others. Enable this rule to make sure
+that either only the non-default value is set (default behaviour) or the nullable must be specified every time (`always`).
+
+#### Configuration
+
+```jsonc
+{
+    "rules": {
+        // If you want to report an error for unnecessary nullables
+        "typeorm-typescript/enforce-relation-types": "error", // or
+        "typeorm-typescript/enforce-relation-types": [
+            "error",
+            { "specifyNullable": "non-default" },
+        ],
+        // If you want to force setting nullable everywhere to avoid confusion
+        "typeorm-typescript/enforce-relation-types": ["error", { "specifyNullable": "always" }],
+    },
+}
+```
+
+#### Examples
+
+Examples of **incorrect code** for this rule:
+
+```ts
+// { "specifyNullable": "non-default" }
+class Entity {
+    // Columns are non-nullable by default, remove it
+    @Column({ type: "varchar", nullable: false })
+    name: number;
+
+    // Relations are nullable by default, remove it
+    @OneToOne(() => Other, { nullable: true })
+    @JoinColumn()
+    other: Other | null;
+}
+```
+
+```ts
+// { "specifyNullable": "always" }
+class Entity {
+    // Mark this to nullable false to make it clear
+    @Column({ type: "varchar" })
+    name: number;
+
+    // Mark this to nullable true to make it clear
+    @OneToOne(() => Other)
+    @JoinColumn()
+    other: Other | null;
+}
+```
+
+Examples of **correct code** for this rule:
+
+```ts
+// { "specifyNullable": "non-default" }
+class Entity {
+    // Nullability only defined when it is different than default
+    @Column({ type: "varchar", nullable: true })
+    middleName: number | null;
+
+    @Column({ type: "varchar" })
+    name: number;
+
+    @OneToOne(() => Other)
+    @JoinColumn()
+    other: Other | null;
+}
+```
+
+```ts
+// { "specifyNullable": "always" }
+class Entity {
+    // Nullable is set everywhere, no default behaviour is implied
+    @Column({ type: "varchar", nullable: true })
+    middleName: number | null;
+
+    @Column({ type: "varchar", nullable: false })
+    name: number;
+
+    @OneToOne(() => Other, { nullable: true })
+    @JoinColumn()
+    other: Other | null;
+}
+```
