@@ -14,60 +14,142 @@ const ruleTester = new RuleTester({
 ruleTester.run('enforce-relation-types', enforceRelationTypes, {
     valid: [
         {
-            name: "should allow valid one-to-one relations",
+            name: 'should allow valid nullable one-to-one relations',
             code: `class Entity {
                 @OneToOne(() => Other)
                 @JoinColumn()
                 other: Other | null;
-
+            }`,
+        },
+        {
+            name: 'should allow valid nullable one-to-one relations with relation defined',
+            code: `class Entity {
                 @OneToOne(() => Other, (other) => other.entity)
                 @JoinColumn()
                 other: Other | null;
-                
+            }`,
+        },
+        {
+            name: 'should allow valid non-nullable one-to-one relations',
+            code: `class Entity {
                 @OneToOne(() => Other, { nullable: false })
                 @JoinColumn()
                 other: Other;
-
+            }`,
+        },
+        {
+            name: 'should allow valid non-nullable one-to-one relations with relation defined',
+            code: `class Entity {
                 @OneToOne(() => Other, (other) => other.entity, { nullable: false })
                 @JoinColumn()
                 other: Other;
             }`,
         },
         {
-            name: "should allow valid one-to-many relations",
+            name: 'should allow valid lazy one-to-one relations',
+            code: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Promise<Other | null>;
+            }`,
+        },
+        {
+            name: 'should allow valid lazy non-nullable one-to-one relations',
+            code: `class Entity {
+                @OneToOne(() => Other, { nullable: false })
+                @JoinColumn()
+                other: Promise<Other>;
+            }`,
+        },
+        {
+            name: 'should allow valid one-to-many relations',
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
                 others: Other[];
             }`,
         },
         {
-            name: "should allow valid many-to-one relations",
+            name: 'should allow lazy one-to-many relations',
+            code: `class Entity {
+                @OneToMany(() => Other, (other) => other.entity)
+                others: Promise<Other[]>;
+            }`,
+        },
+        {
+            name: 'should allow valid nullable many-to-one relations',
             code: `class Entity {
                 @ManyToOne(() => Other)
                 other: Other | null;
-
+            }`,
+        },
+        {
+            name: 'should allow valid non-nullable many-to-one relations',
+            code: `class Entity {
                 @ManyToOne(() => Other, { nullable: false })
                 other: Other;
-                
+            }`,
+        },
+        {
+            name: 'should allow valid nullable many-to-one relations with relation defined',
+            code: `class Entity {
                 @ManyToOne(() => Other, (other) => other.entity)
                 other: Other | null;
-
+            }`,
+        },
+        {
+            name: 'should allow valid non-nullable many-to-one relations with relation defined',
+            code: `class Entity {
                 @ManyToOne(() => Other, (other) => other.entity, { nullable: false })
                 other: Other;
             }`,
         },
         {
-            name: "should allow valid many-to-many relations",
+            name: 'should allow valid lazy many-to-one relations',
+            code: `class Entity {
+                @ManyToOne(() => Other)
+                other: Promise<Other | null>;
+            }`,
+        },
+        {
+            name: 'should allow valid lazy non-nullable many-to-one relations',
+            code: `class Entity {
+                @ManyToOne(() => Other, { nullable: false })
+                other: Promise<Other>;
+            }`,
+        },
+        {
+            name: 'should allow valid many-to-many relations',
             code: `class Entity {
                 @ManyToMany(() => Other)
                 @JoinTable()
                 others: Other[];
             }`,
         },
+        {
+            name: 'should allow lazy many-to-many relations',
+            code: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Promise<Other[]>;
+            }`,
+        },
     ],
     invalid: [
         {
-            name: "should fail on nullable one-to-one relations",
+            name: 'should fail on nullable one-to-one relations',
+            code: `class Entity {
+                @OneToOne()
+                @JoinColumn()
+                other: Other;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_missing',
+                },
+            ],
+        },
+        {
+            name: 'should fail on nullable one-to-one relations',
             code: `class Entity {
                 @OneToOne(() => Other)
                 @JoinColumn()
@@ -98,7 +180,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on unspecified nullable one-to-one relations",
+            name: 'should fail on unspecified nullable one-to-one relations',
             code: `class Entity {
                 @OneToOne(() => Other, {})
                 @JoinColumn()
@@ -121,7 +203,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on mismatched one-to-one relations",
+            name: 'should fail on mismatched one-to-one relations',
             code: `class Entity {
                 @OneToOne(() => Other)
                 @JoinColumn()
@@ -144,7 +226,30 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on primitive one-to-one relations",
+            name: 'should fail on mismatched one-to-one promise relations',
+            code: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Promise<Another | null>;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Promise<Other | null>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on primitive one-to-one relations',
             code: `class Entity {
                 @OneToOne(() => Other)
                 @JoinColumn()
@@ -167,7 +272,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on literal one-to-one relations",
+            name: 'should fail on literal one-to-one relations',
             code: `class Entity {
                 @OneToOne(() => Other)
                 @JoinColumn()
@@ -190,7 +295,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on non nullable one-to-one relations",
+            name: 'should fail on non nullable one-to-one relations',
             code: `class Entity {
                 @OneToOne(() => Other, { nullable: false })
                 @JoinColumn()
@@ -213,7 +318,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on nullable one-to-many relations",
+            name: 'should fail on nullable one-to-many relations',
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
                 others: Other;
@@ -234,7 +339,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on mismatched one-to-many relations",
+            name: 'should fail on mismatched one-to-many relations',
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
                 others: Another[];
@@ -255,7 +360,28 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on primitive one-to-many relations",
+            name: 'should fail on mismatched lazy one-to-many relations',
+            code: `class Entity {
+                    @OneToMany(() => Other, (other) => other.entity)
+                    others: Promise<Another[]>;
+                }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                    @OneToMany(() => Other, (other) => other.entity)
+                    others: Promise<Other[]>;
+                }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on primitive one-to-many relations',
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
                 others: string[];
@@ -276,7 +402,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on nullable many-to-one relations",
+            name: 'should fail on nullable many-to-one relations',
             code: `class Entity {
                 @ManyToOne(() => Other)
                 other: Other;
@@ -304,7 +430,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on unspecified nullable many-to-one relations",
+            name: 'should fail on unspecified nullable many-to-one relations',
             code: `class Entity {
                 @ManyToOne(() => Other, {})
                 other: Other;
@@ -325,7 +451,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on mismatched many-to-one relations",
+            name: 'should fail on mismatched many-to-one relations',
             code: `class Entity {
                 @ManyToOne(() => Other)
                 other: Another | null;
@@ -346,7 +472,28 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on primitive many-to-one relations",
+            name: 'should fail on mismatched many-to-one relations',
+            code: `class Entity {
+                @ManyToOne(() => Other)
+                other: Promise<Another | null>;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToOne(() => Other)
+                other: Promise<Other | null>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on primitive many-to-one relations',
             code: `class Entity {
                 @ManyToOne(() => Other)
                 other: string;
@@ -367,7 +514,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on non-nullable many-to-one relations",
+            name: 'should fail on non-nullable many-to-one relations',
             code: `class Entity {
                 @ManyToOne(() => Other, { nullable: false })
                 other: Other | null;
@@ -388,7 +535,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on nullable many-to-many relations",
+            name: 'should fail on nullable many-to-many relations',
             code: `class Entity {
                 @ManyToMany(() => Other)
                 @JoinTable()
@@ -411,7 +558,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on mismatched many-to-many relations",
+            name: 'should fail on mismatched many-to-many relations',
             code: `class Entity {
                 @ManyToMany(() => Other)
                 @JoinTable()
@@ -434,7 +581,30 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: "should fail on primitive many-to-many relations",
+            name: 'should fail on mismatched lazy many-to-many relations',
+            code: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Promise<Another[]>;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Promise<Other[]>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on primitive many-to-many relations',
             code: `class Entity {
                 @ManyToMany(() => Other)
                 @JoinTable()
