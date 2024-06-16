@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2024-06-16
+
 ### Added
 
 - **NEW RULE** `enforce-consistent-nullability`: enable this to make sure that nullable is consistent everywhere ([#9](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/9))
