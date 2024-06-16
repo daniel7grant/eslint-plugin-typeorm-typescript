@@ -4,6 +4,9 @@
 
 ### Added
 
+- **NEW RULE** `enforce-consistent-nullability`: enable this to make sure that nullable is consistent everywhere ([#9](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/9))
+    - set `specifyNullable` to `always` to make the `nullable` property required everywhere
+    - set `specifyNullable` to `non-default` (default behaviour) to print errors when `nullable` is set to the default value
 - Allow Column decorator to handle string parameters, multiple parameters
 - Add UUID column-type to string types
 - Add support for additional Column decorators:
