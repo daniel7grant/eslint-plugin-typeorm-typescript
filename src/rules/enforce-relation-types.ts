@@ -20,6 +20,7 @@ const createRule = ESLintUtils.RuleCreator(
 );
 
 type EnforceColumnMessages =
+    | 'typescript_typeorm_relation_missing'
     | 'typescript_typeorm_relation_mismatch'
     | 'typescript_typeorm_relation_array_to_many'
     | 'typescript_typeorm_relation_nullable_by_default'
@@ -37,6 +38,8 @@ const enforceColumnTypes = createRule({
         },
         hasSuggestions: true,
         messages: {
+            typescript_typeorm_relation_missing:
+                'Relation {{ relation }} of {{ propertyName }}{{ className }} does not have an arrow function with the relation type.',
             typescript_typeorm_relation_mismatch:
                 'Type of {{ propertyName }}{{ className }} is not consistent with the TypeORM relation type {{ relation }}{{ expectedValue }}.',
             typescript_typeorm_relation_array_to_many:
@@ -65,6 +68,23 @@ const enforceColumnTypes = createRule({
 
                 const [relation, relArguments] = relationArguments;
                 const typeormType = convertArgumentToRelationType(relation, relArguments);
+                if (!typeormType) {
+                    const propertyName =
+                        node.key?.type === AST_NODE_TYPES.Identifier ? node.key.name : 'property';
+                    const classObject = findParentClass(node);
+                    const className = classObject?.id ? ` in ${classObject.id.name}` : '';
+                    context.report({
+                        node,
+                        messageId: 'typescript_typeorm_relation_missing',
+                        data: {
+                            className,
+                            propertyName,
+                            relation,
+                        },
+                        loc: node.loc,
+                    });
+                    return;
+                }
 
                 if (!node.typeAnnotation) {
                     return;
@@ -75,7 +95,7 @@ const enforceColumnTypes = createRule({
                 if (!isTypesEqual(typeormType, typescriptType)) {
                     let messageId: EnforceColumnMessages = 'typescript_typeorm_relation_mismatch';
                     const suggestions: ReportSuggestionArray<EnforceColumnMessages> = [];
-                    const fixReplace = typeToString(typeormType);
+                    const fixReplace = typeToString(typeormType, typescriptType);
 
                     // Construct strings for error message
                     const propertyName =

@@ -12,6 +12,8 @@
     - Version column decorator `VersionColumn` is number.
 - Add support for [Typed Rules](https://typescript-eslint.io/getting-started/typed-linting) on Column types
     - This allows to resolve referenced types (e.g. type aliases) in TypeScript types
+- Allow lazy relations with `Promise<Relation>` ([#10](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/10))
+- Report error when the relation doesn't have an arrow function defined
 
 ### Changed
 
