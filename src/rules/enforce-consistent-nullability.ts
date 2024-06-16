@@ -72,10 +72,11 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
                     return;
                 }
 
-                const [column, colArguments] = columnArguments;
-                const defaultNullability = column === 'OneToOne' || column === 'ManyToOne';
+                const [decoratorName, decoratorArguments] = columnArguments;
+                const defaultNullability =
+                    decoratorName === 'OneToOne' || decoratorName === 'ManyToOne';
 
-                const argumentNode = colArguments.find(
+                const argumentNode = decoratorArguments.find(
                     (arg): arg is TSESTree.ObjectExpression =>
                         arg.type === AST_NODE_TYPES.ObjectExpression,
                 );
@@ -86,7 +87,7 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
                     (specifyNullable === 'non-default' && nullable === defaultNullability)
                 ) {
                     // Construct strings for error message
-                    const reportedNode = argumentNode ?? colArguments[0]?.parent ?? node;
+                    const reportedNode = argumentNode ?? decoratorArguments[0]?.parent ?? node;
                     const propertyName =
                         node.key?.type === AST_NODE_TYPES.Identifier ? node.key.name : 'property';
                     const classObject = findParentClass(node);
@@ -118,9 +119,9 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
                                     // specifyNullable === 'always', add nullable property
                                     // There is no options object
                                     if (!argumentNode) {
-                                        if (colArguments.length >= 1) {
+                                        if (decoratorArguments.length >= 1) {
                                             return fixer.insertTextAfter(
-                                                colArguments[colArguments.length - 1],
+                                                decoratorArguments[decoratorArguments.length - 1],
                                                 `, { nullable: ${defaultNullability} }`,
                                             );
                                         }
@@ -131,8 +132,12 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
                                                     AST_NODE_TYPES.CallExpression &&
                                                 d.expression.callee.type ===
                                                     AST_NODE_TYPES.Identifier &&
-                                                d.expression.callee.name === column,
-                                        )!;
+                                                d.expression.callee.name === decoratorName,
+                                        );
+
+                                        if (!decorator) {
+                                            throw new Error(`Decorator ${decoratorName} failed.`);
+                                        }
 
                                         return fixer.insertTextAfterRange(
                                             [decorator.range[0], decorator.range[1] - 1],
@@ -159,14 +164,14 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
                                     // specifyNullable === 'non-default', remove nullable property
                                     // There is a properties object only with one property (remove whole object)
                                     if (argumentNode.properties.length === 1) {
-                                        const index = colArguments.findIndex(
+                                        const index = decoratorArguments.findIndex(
                                             (arg) => arg === argumentNode,
                                         );
 
                                         // Remove object and previous comma as well
                                         if (index >= 1) {
                                             return fixer.removeRange([
-                                                colArguments[index - 1].range[1],
+                                                decoratorArguments[index - 1].range[1],
                                                 argumentNode.range[1],
                                             ]);
                                         }
