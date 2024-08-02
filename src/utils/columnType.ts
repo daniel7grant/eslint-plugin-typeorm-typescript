@@ -328,7 +328,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
 export function isTypesEqual(toType: ColumnType, tsType: ColumnType): boolean {
     // If either is unknown, we only check the nullability
     if (toType.columnType === 'unknown' || tsType.columnType === 'unknown') {
-        return toType.nullable === tsType.nullable && toType.array === tsType.array;
+        return toType.nullable === tsType.nullable;
     }
     // Dates can be parsed into strings too
     if (

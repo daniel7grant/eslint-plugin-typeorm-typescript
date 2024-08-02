@@ -166,6 +166,13 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
+            name: 'should ignore unknown array types',
+            code: `class Entity {
+                @Column({ type: 'json' })
+                unknownArray: unknown[];
+            }`,
+        },
+        {
             name: 'should allow reference types',
             code: `type JsonObject = {};
             class Entity {

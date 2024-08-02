@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Ignore array on JSON columns
+
 ## [0.3.0] - 2024-06-16
 
 ### Added
