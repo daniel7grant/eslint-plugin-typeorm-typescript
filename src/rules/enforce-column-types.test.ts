@@ -159,14 +159,14 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
-            name: 'should ignore unknown types',
+            name: 'should allow unknown types',
             code: `class Entity {
                 @Column({ type: 'json' })
                 unknownField: unknown;
             }`,
         },
         {
-            name: 'should ignore unknown array types',
+            name: 'should allow unknown array types',
             code: `class Entity {
                 @Column({ type: 'json' })
                 unknownArray: unknown[];
@@ -186,6 +186,14 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             class Entity {
                 @Column({ type: 'json', nullable: true })
                 referenceNullable: JsonObject | null;
+            }`,
+        },
+        {
+            name: 'should allow reference array types',
+            code: `type JsonObject = {};
+            class Entity {
+                @Column({ type: 'jsonb' })
+                referenceArray: JsonObject[];
             }`,
         },
         {
