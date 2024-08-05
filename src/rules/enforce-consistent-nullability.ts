@@ -3,7 +3,7 @@ import {
     findEitherDecoratorArguments,
     findParentClass,
     parseObjectLiteral,
-} from '../utils/treeTraversal';
+} from '../utils/treeTraversal.js';
 
 type ErrorMessages =
     | 'typescript_typeorm_missing_nullability'

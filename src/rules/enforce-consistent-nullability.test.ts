@@ -2,7 +2,7 @@ import path from 'path';
 import * as vitest from 'vitest';
 import tsParser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import enforceConsistentNullability from './enforce-consistent-nullability';
+import enforceConsistentNullability from './enforce-consistent-nullability.js';
 
 RuleTester.afterAll = vitest.afterAll;
 RuleTester.it = vitest.it;

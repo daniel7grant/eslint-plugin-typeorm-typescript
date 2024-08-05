@@ -8,7 +8,7 @@ import {
     UnionTypeNode,
     isTypeReferenceNode,
 } from 'typescript';
-import { parseObjectLiteral } from './treeTraversal';
+import { parseObjectLiteral } from './treeTraversal.js';
 
 type Column =
     | 'Column'

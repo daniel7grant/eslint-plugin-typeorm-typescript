@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils';
-import { findObjectArgument, findReturnedValue, parseObjectLiteral } from './treeTraversal';
+import { findObjectArgument, findReturnedValue, parseObjectLiteral } from './treeTraversal.js';
 
 interface RelationType {
     name: string;

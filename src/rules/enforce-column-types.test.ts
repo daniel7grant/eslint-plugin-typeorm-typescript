@@ -2,7 +2,7 @@ import path from 'path';
 import * as vitest from 'vitest';
 import tsParser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import enforceColumnTypes from './enforce-column-types';
+import enforceColumnTypes from './enforce-column-types.js';
 
 RuleTester.afterAll = vitest.afterAll;
 RuleTester.it = vitest.it;

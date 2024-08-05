@@ -11,8 +11,8 @@ import {
     convertTypeToColumnType,
     isTypesEqual,
     typeToString,
-} from '../utils/columnType';
-import { findEitherDecoratorArguments, findParentClass } from '../utils/treeTraversal';
+} from '../utils/columnType.js';
+import { findEitherDecoratorArguments, findParentClass } from '../utils/treeTraversal.js';
 
 const createRule = ESLintUtils.RuleCreator(
     (name) =>

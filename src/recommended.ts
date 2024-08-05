@@ -1,5 +1,5 @@
 import { FlatConfig } from '@typescript-eslint/utils/ts-eslint';
-import plugin from './index';
+import { plugin } from './index.js';
 
 const config: FlatConfig.Config = {
     plugins: {
