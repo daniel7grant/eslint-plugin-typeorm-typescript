@@ -29,7 +29,6 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
         type: 'problem',
         docs: {
             description: 'TypeORM nullability should be consistent.',
-            recommended: 'recommended',
         },
         hasSuggestions: true,
         messages: {
