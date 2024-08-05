@@ -19,8 +19,10 @@
         }
     },
     "scripts": {
+        "prebuild:cjs": "sed -i 's/\"type\": \"module\"/\"type\": \"commonjs\"/' package.json",
+        "build:cjs": "tsc -p tsconfig.json",
+        "postbuild:cjs": "sed -i 's/\"type\": \"commonjs\"/\"type\": \"module\"/' package.json",
         "build:es": "tsc -p tsconfig.es.json",
-        "build:cjs": "sed -i 's/\"type\": \"module\"/\"type\": \"commonjs\"/' package.json && tsc -p tsconfig.json && sed -i 's/\"type\": \"commonjs\"/\"type\": \"module\"/' package.json",
         "build": "npm run build:cjs && npm run build:es",
         "lint": "eslint src/",
         "test": "vitest run"
