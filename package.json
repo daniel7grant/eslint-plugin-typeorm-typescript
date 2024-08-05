@@ -3,11 +3,25 @@
     "version": "0.3.0",
     "description": "An ESLint plugin to catch mistakes if the TypeORM column types and TypeScript types aren't consistent.",
     "main": "dist/index.js",
+    "type": "module",
     "files": [
-        "dist"
+        "dist",
+        "es"
     ],
+    "exports": {
+        ".": {
+            "import": "./es/index.js",
+            "require": "./dist/index.js"
+        },
+        "./recommended": {
+            "import": "./es/recommended.js",
+            "require": "./dist/recommended.js"
+        }
+    },
     "scripts": {
-        "build": "tsc -p tsconfig.json",
+        "build:es": "tsc -p tsconfig.es.json",
+        "build:cjs": "sed -i 's/\"type\": \"module\"/\"type\": \"commonjs\"/' package.json && tsc -p tsconfig.json && sed -i 's/\"type\": \"commonjs\"/\"type\": \"module\"/' package.json",
+        "build": "npm run build:cjs && npm run build:es",
         "lint": "eslint src/",
         "test": "vitest run"
     },
@@ -26,6 +40,7 @@
     "devDependencies": {
         "@eslint/js": "^9.8.0",
         "@types/eslint": "^9.6.0",
+        "@types/node": "^22.1.0",
         "@typescript-eslint/rule-tester": "^8.0.0",
         "eslint": "^9.8.0",
         "eslint-config-prettier": "^9.0.0",

@@ -1,2 +1,4 @@
-dist/
+dist/*
+!dist/package.json
+es/
 node_modules/
