@@ -12,7 +12,48 @@ Install the package for the plugin:
 npm install -D eslint-plugin-typeorm-typescript
 ```
 
-Update `.eslintrc.json` with the plugin to the `plugins` key, and add it to the `rules`:
+### Flat configuration
+
+To enable all rules, add the recommended configuration for `eslint-plugin-typeorm-typescript` to `eslint.config.mjs`:
+
+```js
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import typeormTypescriptRecommended from 'eslint-plugin-typeorm-typescript/recommended';
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  typeormTypescriptRecommended,
+);
+```
+
+If you want to change the options, enable the plugin and the rules manually:
+
+```js
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import typeormTypescriptPlugin from 'eslint-plugin-typeorm-typescript';
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    plugins: {'typeorm-typescript': typeormTypescriptPlugin},
+    rules: {
+      "typeorm-typescript/enforce-column-types": "error",
+      "typeorm-typescript/enforce-relation-types": "warn",
+      "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "always" }]
+    }
+  }
+);
+```
+
+For more information, see an example of the [recommended configuration](./examples/recommended/).
+
+### Legacy configuration
+
+If you are still on legacy ESLint, update `.eslintrc.json` with the plugin to the `plugins` key, and add it to the `rules`:
 
 ```json
 {
@@ -24,6 +65,8 @@ Update `.eslintrc.json` with the plugin to the `plugins` key, and add it to the 
   }
 }
 ```
+
+For more information, see an example of the [legacy configuration](./examples/legacy/).
 
 ## Rules
 
