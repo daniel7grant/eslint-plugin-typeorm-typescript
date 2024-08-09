@@ -15,6 +15,8 @@
     - Add extension to every import to comply with ES specification
 - Add examples to be used as simple setup and end-to-end tests
 
+## [0.3.1] - 2024-08-06
+
 ### Changed
 
 - Ignore array on JSON columns
