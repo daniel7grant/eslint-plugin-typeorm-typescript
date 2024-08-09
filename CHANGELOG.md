@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2024-08-09
+
 ### Added
 
 - Add support for flat configuration
