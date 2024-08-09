@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add support for flat configuration
+    - Update `typescript-eslint` packages to v8
+    - Update `eslint` packages to v9
+    - There is a new export `eslint-plugin-typeorm-typescript/recommended`, for simple interfacing of the flat configuration
+- Add dual ES Module and CommonJS support
+    - Add `tsconfig.es.json` to output ES Modules to `es/`
+    - Output CommonJS format to `dist/` (needs hack to set the `module` to `commonjs` in `package.json`)
+    - Add `exports` fields to `package.json` for `.` and `./recommended`
+    - Add extension to every import to comply with ES specification
+- Add examples to be used as simple setup and end-to-end tests
+
 ## [0.3.1] - 2024-08-06
 
 ### Changed

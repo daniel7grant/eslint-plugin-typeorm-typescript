@@ -3,7 +3,7 @@ import {
     findEitherDecoratorArguments,
     findParentClass,
     parseObjectLiteral,
-} from '../utils/treeTraversal';
+} from '../utils/treeTraversal.js';
 
 type ErrorMessages =
     | 'typescript_typeorm_missing_nullability'
@@ -29,7 +29,6 @@ const enforceConsistentNullability = createRule<Options, ErrorMessages>({
         type: 'problem',
         docs: {
             description: 'TypeORM nullability should be consistent.',
-            recommended: 'recommended',
         },
         hasSuggestions: true,
         messages: {

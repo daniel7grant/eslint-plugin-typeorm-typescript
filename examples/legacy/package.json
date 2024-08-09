@@ -1,0 +1,23 @@
+{
+  "name": "legacy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint -c .eslintrc.cjs index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-typeorm-typescript": "file:../..",
+    "prettier": "^3.2.5",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.20"
+  }
+}

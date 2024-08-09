@@ -24,3 +24,15 @@ jobs:
         run: npm test
       - name: Build TypeScript files
         run: npm run build
+      - name: Test ESLint 9 example for compatibility
+        run: |
+          cd examples/recommended
+          npm ci
+          (npm run lint || true) | grep -aq "Type of name in User is not matching the TypeORM column type (expected type: string)"
+      - name: Test legacy example for compatibility
+        run: |
+          # Workaround until they fix scoping
+          mv eslint.config.mjs _eslint.config.mjs
+          cd examples/legacy
+          npm ci
+          (npm run lint || true) | grep -aq "Type of name in User is not matching the TypeORM column type (expected type: string)"
