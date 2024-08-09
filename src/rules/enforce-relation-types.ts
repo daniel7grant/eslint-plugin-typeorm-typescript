@@ -4,7 +4,7 @@ import {
     findEitherDecoratorArguments,
     findObjectArgument,
     findParentClass,
-} from '../utils/treeTraversal';
+} from '../utils/treeTraversal.js';
 import {
     convertArgumentToRelationType,
     convertTypeToRelationType,
@@ -12,7 +12,7 @@ import {
     typeToString,
     isTypeMissingNullable,
     isTypeMissingArray,
-} from '../utils/relationType';
+} from '../utils/relationType.js';
 
 const createRule = ESLintUtils.RuleCreator(
     (name) =>
@@ -34,7 +34,6 @@ const enforceColumnTypes = createRule({
         type: 'problem',
         docs: {
             description: 'TypeScript types should be consistent with the relations.',
-            recommended: 'recommended',
         },
         hasSuggestions: true,
         messages: {

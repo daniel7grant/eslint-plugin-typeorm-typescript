@@ -11,8 +11,8 @@ import {
     convertTypeToColumnType,
     isTypesEqual,
     typeToString,
-} from '../utils/columnType';
-import { findEitherDecoratorArguments, findParentClass } from '../utils/treeTraversal';
+} from '../utils/columnType.js';
+import { findEitherDecoratorArguments, findParentClass } from '../utils/treeTraversal.js';
 
 const createRule = ESLintUtils.RuleCreator(
     (name) =>
@@ -26,7 +26,6 @@ const enforceColumnTypes = createRule({
         type: 'problem',
         docs: {
             description: 'TypeORM and TypeScript types should be the same on columns.',
-            recommended: 'recommended',
         },
         hasSuggestions: true,
         messages: {

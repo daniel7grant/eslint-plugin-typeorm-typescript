@@ -1,6 +1,8 @@
+import path from 'path';
 import * as vitest from 'vitest';
+import tsParser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import enforceRelationTypes from './enforce-relation-types';
+import enforceRelationTypes from './enforce-relation-types.js';
 
 RuleTester.afterAll = vitest.afterAll;
 RuleTester.it = vitest.it;
@@ -8,7 +10,13 @@ RuleTester.itOnly = vitest.it.only;
 RuleTester.describe = vitest.describe;
 
 const ruleTester = new RuleTester({
-    parser: '@typescript-eslint/parser',
+    languageOptions: {
+        parser: tsParser,
+        parserOptions: {
+            project: './tsconfig.json',
+            tsconfigRootDir: path.join(__dirname, '../../tests'),
+        },
+    },
 });
 
 ruleTester.run('enforce-relation-types', enforceRelationTypes, {
