@@ -1,4 +1,4 @@
-import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
 import { ReportSuggestionArray } from '@typescript-eslint/utils/ts-eslint';
 import {
     findEitherDecoratorArguments,
@@ -53,7 +53,21 @@ const enforceColumnTypes = createRule({
         schema: [],
     },
     create(context) {
+        let relationWrapperAlias: string | undefined;
+
         return {
+            ImportDeclaration(node) {
+                if (node.source.value !== 'typeorm') return;
+
+                for (const specifier of node.specifiers) {
+                    if (specifier.type !== TSESTree.AST_NODE_TYPES.ImportSpecifier) continue;
+                    const { imported } = specifier;
+                    if (imported.name === 'Relation') {
+                        relationWrapperAlias = specifier.local.name;
+                        return;
+                    }
+                }
+            },
             PropertyDefinition(node) {
                 const relationArguments = findEitherDecoratorArguments(node.decorators, [
                     'OneToOne',
@@ -89,7 +103,10 @@ const enforceColumnTypes = createRule({
                     return;
                 }
                 const { typeAnnotation } = node.typeAnnotation;
-                const typescriptType = convertTypeToRelationType(typeAnnotation);
+                const typescriptType = convertTypeToRelationType(
+                    typeAnnotation,
+                    relationWrapperAlias,
+                );
 
                 if (!isTypesEqual(typeormType, typescriptType)) {
                     let messageId: EnforceColumnMessages = 'typescript_typeorm_relation_mismatch';

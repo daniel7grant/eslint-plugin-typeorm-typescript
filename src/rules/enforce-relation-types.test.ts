@@ -141,6 +141,51 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
                 others: Promise<Other[]>;
             }`,
         },
+        {
+            name: 'should allow lazy relations wrapped with Relation<...> wrapper array',
+            code: `import { Relation } from 'typeorm';
+            class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Promise<Relation<Other>[]>;
+            }`,
+        },
+        {
+            name: 'should allow lazy relations array with Relation<...> wrapper',
+            code: `import { Relation } from 'typeorm';
+            class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Promise<Relation<Other[]>>;
+            }`,
+        },
+        {
+            name: 'should allow scalar relations wrapped with Relation<...> wrapper',
+            code: `import { Relation } from 'typeorm';
+            class Entity {
+                @OneToOne(() => Other)
+                @JoinTable()
+                others: Relation<Other> | null;
+            }`,
+        },
+        {
+            name: 'should allow nullable relations wrapped with Relation<...> wrapper covering null',
+            code: `import { Relation } from 'typeorm';
+            class Entity {
+                @OneToOne(() => Other, { nullable: true })
+                @JoinTable()
+                others: Relation<Other | null>;
+            }`,
+        },
+        {
+            name: 'should allow nullable relations wrapped with Relation<...> wrapper not covering null',
+            code: `import { Relation } from 'typeorm';
+            class Entity {
+                @OneToOne(() => Other, { nullable: true })
+                @JoinTable()
+                others: Relation<Other> | null;
+            }`,
+        },
     ],
     invalid: [
         {

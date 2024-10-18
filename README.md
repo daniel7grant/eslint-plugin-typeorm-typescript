@@ -176,6 +176,8 @@ class Entity {
 Examples of **correct code** for this rule:
 
 ```ts
+import { Relation } from 'typeorm';
+
 class Entity {
     // Join is correctly nullable...
     @OneToOne(() => Other)
@@ -190,6 +192,11 @@ class Entity {
     // *ToMany rules are an array
     @OneToMany(() => Other, (other) => other.entity)
     others: Other[];
+
+    // Even accepts if you wrap the relation type with the typeorm Relation<...>-wrapper
+    @OneToOne(() => Other, { nullable: true })
+    @JoinColumn()
+    other: Relation<Other> | null;
 }
 ```
 

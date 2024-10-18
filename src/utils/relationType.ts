@@ -10,16 +10,22 @@ interface RelationType {
 
 export type Relation = 'OneToOne' | 'OneToMany' | 'ManyToOne' | 'ManyToMany';
 
-export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType {
+export function convertTypeToRelationType(
+    arg: TSESTree.TypeNode,
+    relationWrapperName?: string,
+): RelationType {
     switch (arg.type) {
         case AST_NODE_TYPES.TSTypeReference: {
             const name = arg.typeName.type === AST_NODE_TYPES.Identifier ? arg.typeName.name : '';
             const param = arg.typeArguments?.params?.[0];
             if (name === 'Promise' && param) {
                 return {
-                    ...convertTypeToRelationType(param),
+                    ...convertTypeToRelationType(param, relationWrapperName),
                     isLazy: true,
                 };
+            }
+            if (name === relationWrapperName && param) {
+                return convertTypeToRelationType(param, relationWrapperName);
             }
             return {
                 name,
@@ -29,7 +35,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
             };
         }
         case AST_NODE_TYPES.TSArrayType: {
-            const item = convertTypeToRelationType(arg.elementType);
+            const item = convertTypeToRelationType(arg.elementType, relationWrapperName);
             return { ...item, isArray: true };
         }
         case AST_NODE_TYPES.TSNullKeyword: {
@@ -38,7 +44,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
         case AST_NODE_TYPES.TSUnionType: {
             return arg.types.reduce(
                 (acc, currentNode) => {
-                    const current = convertTypeToRelationType(currentNode);
+                    const current = convertTypeToRelationType(currentNode, relationWrapperName);
                     return {
                         name: acc.name || current.name,
                         isArray: acc.isArray || current.isArray,
