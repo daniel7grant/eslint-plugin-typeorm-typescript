@@ -22,9 +22,9 @@ import tseslint from 'typescript-eslint';
 import typeormTypescriptRecommended from 'eslint-plugin-typeorm-typescript/recommended';
 
 export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  typeormTypescriptRecommended,
+    eslint.configs.recommended,
+    ...tseslint.configs.recommended,
+    typeormTypescriptRecommended,
 );
 ```
 
@@ -35,18 +35,17 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import typeormTypescriptPlugin from 'eslint-plugin-typeorm-typescript';
 
-export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  {
-    plugins: {'typeorm-typescript': typeormTypescriptPlugin},
+export default tseslint.config(eslint.configs.recommended, ...tseslint.configs.recommended, {
+    plugins: { 'typeorm-typescript': typeormTypescriptPlugin },
     rules: {
-      "typeorm-typescript/enforce-column-types": "error",
-      "typeorm-typescript/enforce-relation-types": "warn",
-      "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "always" }]
-    }
-  }
-);
+        'typeorm-typescript/enforce-column-types': 'error',
+        'typeorm-typescript/enforce-relation-types': 'warn',
+        'typeorm-typescript/enforce-consistent-nullability': [
+            'error',
+            { specifyNullable: 'always' },
+        ],
+    },
+});
 ```
 
 For more information, see an example of the [recommended configuration](./examples/recommended/).
@@ -57,12 +56,12 @@ If you are still on legacy ESLint, update `.eslintrc.json` with the plugin to th
 
 ```json
 {
-  "plugins": ["typeorm-typescript"],
-  "rules": {
-    "typeorm-typescript/enforce-column-types": "error",
-    "typeorm-typescript/enforce-relation-types": "error",
-    "typeorm-typescript/enforce-consistent-nullability": "error"
-  }
+    "plugins": ["typeorm-typescript"],
+    "rules": {
+        "typeorm-typescript/enforce-column-types": "error",
+        "typeorm-typescript/enforce-relation-types": "error",
+        "typeorm-typescript/enforce-consistent-nullability": "error"
+    }
 }
 ```
 
@@ -87,9 +86,9 @@ It also handle primary columns (`number` by default), create and update columns 
 
 ```json
 {
-  "rules": {
-    "typeorm-typescript/enforce-column-types": "error"
-  }
+    "rules": {
+        "typeorm-typescript/enforce-column-types": "error"
+    }
 }
 ```
 
@@ -100,11 +99,11 @@ Examples of **incorrect code** for this rule:
 ```ts
 class Entity {
     // Should be string
-    @Column({ type: "varchar" })
+    @Column({ type: 'varchar' })
     name: number;
 
     // Should be string | null
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     name: string;
 
     // Should be Date | null
@@ -118,11 +117,11 @@ Examples of **correct code** for this rule:
 ```ts
 class Entity {
     // TypeORM data type and TypeScript type are consistent
-    @Column({ type: "varchar" })
+    @Column({ type: 'varchar' })
     name: string;
 
     // Nullability is correct
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     name: string | null;
 }
 ```
@@ -137,9 +136,9 @@ which is an easy mistake to make.
 
 ```json
 {
-  "rules": {
-    "typeorm-typescript/enforce-relation-types": "error"
-  }
+    "rules": {
+        "typeorm-typescript/enforce-relation-types": "error"
+    }
 }
 ```
 
@@ -207,9 +206,15 @@ that either only the non-default value is set (no parameters or `non-default`) o
     "rules": {
         // If you want to report an error for unnecessary nullables
         "typeorm-typescript/enforce-consistent-nullability": "error", // or
-        "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "non-default" }],
+        "typeorm-typescript/enforce-consistent-nullability": [
+            "error",
+            { "specifyNullable": "non-default" },
+        ],
         // If you want to force setting nullable everywhere to avoid confusion
-        "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "always" }],
+        "typeorm-typescript/enforce-consistent-nullability": [
+            "error",
+            { "specifyNullable": "always" },
+        ],
     },
 }
 ```
@@ -223,7 +228,7 @@ With `{ "specifyNullable": "non-default" }`:
 ```ts
 class Entity {
     // Columns are non-nullable by default, remove it
-    @Column({ type: "varchar", nullable: false })
+    @Column({ type: 'varchar', nullable: false })
     name: number;
 
     // Relations are nullable by default, remove it
@@ -238,7 +243,7 @@ With `{ "specifyNullable": "always" }`:
 ```ts
 class Entity {
     // Mark this to nullable false to make it clear
-    @Column({ type: "varchar" })
+    @Column({ type: 'varchar' })
     name: number;
 
     // Mark this to nullable true to make it clear
@@ -255,10 +260,10 @@ With `{ "specifyNullable": "non-default" }`:
 ```ts
 class Entity {
     // Nullability only defined when it is different than default
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     middleName: number | null;
 
-    @Column({ type: "varchar" })
+    @Column({ type: 'varchar' })
     name: number;
 
     @OneToOne(() => Other)
@@ -272,14 +277,64 @@ With `{ "specifyNullable": "always" }`:
 ```ts
 class Entity {
     // Nullable is set everywhere, no default behaviour is implied
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     middleName: number | null;
 
-    @Column({ type: "varchar", nullable: false })
+    @Column({ type: 'varchar', nullable: false })
     name: number;
 
     @OneToOne(() => Other, { nullable: true })
     @JoinColumn()
     other: Other | null;
+}
+```
+
+### typeorm-typescript/enforce-relation-wrapper
+
+TypeORM offers a Relation wrapper which is required when migrating to ESM, to avoid dependency issues. See also [Relations in ESM projects](https://typeorm.io/#relations-in-esm-projects). However, esp. during migration to ESM it may happen that all relations must be updated by hand, which might be very cumbersome. This rule allows to enforce the Relation<...>-wrapper and also may fix your code to do the migration for you.
+
+#### Configuration
+
+```json
+{
+    "rules": {
+        "typeorm-typescript/enforce-relation-wrapper": "error"
+    }
+}
+```
+
+#### Examples
+
+Examples of **incorrect code** for this rule:
+
+```ts
+class Entity {
+    // Should be Relation<Other> | null
+    @OneToOne(() => Other)
+    @JoinColumn()
+    other: Other | null;
+
+    // Should be Relation<Other[]>
+    @OneToMany(() => Other, (other) => other.entity)
+    other: Other[];
+
+    // Should be Relation<Other> | null
+    @ManyToOne(() => Other)
+    other: Other;
+}
+```
+
+Examples of **correct code** for this rule:
+
+```ts
+class Entity {
+    // Join is correctly nullable relation ....
+    @OneToOne(() => Other)
+    @JoinColumn()
+    other: Relation<Other> | null;
+
+    // *ToMany rules are an array relation
+    @OneToMany(() => Other, (other) => other.entity)
+    others: Relation<Other[]>;
 }
 ```
