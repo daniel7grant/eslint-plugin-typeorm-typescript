@@ -23,13 +23,19 @@ type EnforceColumnMessages =
     | 'typescript_typeorm_relation_missing'
     | 'typescript_typeorm_relation_mismatch'
     | 'typescript_typeorm_relation_array_to_many'
-    | 'typescript_typeorm_relation_nullable_by_default'
     | 'typescript_typeorm_relation_suggestion'
-    | 'typescript_typeorm_relation_nullable_by_default_suggestion';
+    | 'typescript_typeorm_relation_nullable_by_default'
+    | 'typescript_typeorm_relation_nullable_by_default_suggestion'
+    | 'typescript_typeorm_relation_specify_relation_always';
+type Options = [
+    {
+        specifyRelation?: 'always';
+    },
+];
 
-const enforceColumnTypes = createRule({
+const enforceColumnTypes = createRule<Options, EnforceColumnMessages>({
     name: 'enforce-relation-types',
-    defaultOptions: [],
+    defaultOptions: [{}],
     meta: {
         type: 'problem',
         docs: {
@@ -43,14 +49,27 @@ const enforceColumnTypes = createRule({
                 'Type of {{ propertyName }}{{ className }} is not consistent with the TypeORM relation type {{ relation }}{{ expectedValue }}.',
             typescript_typeorm_relation_array_to_many:
                 '{{ relation }} relations return multiple entities. Type of {{ propertyName }}{{ className }} should be an array {{ expectedValue }}.',
-            typescript_typeorm_relation_nullable_by_default:
-                'TypeORM relations are nullable by default. Type of {{ propertyName }}{{ className }} should be nullable{{ expectedValue }}.',
             typescript_typeorm_relation_suggestion:
                 'Change the type of {{ propertyName }} to {{ expectedValue }}.',
+            typescript_typeorm_relation_nullable_by_default:
+                'TypeORM relations are nullable by default. Type of {{ propertyName }}{{ className }} should be nullable{{ expectedValue }}.',
             typescript_typeorm_relation_nullable_by_default_suggestion:
                 'Make the {{ relation }} relation nullable: false.',
+            typescript_typeorm_relation_specify_relation_always:
+                'To avoid circular dependencies, wrap your type of {{ propertyName }} with `Relation`{{ expectedValue }}.',
         },
-        schema: [],
+        schema: [
+            {
+                type: 'object',
+                properties: {
+                    specifyRelation: {
+                        type: 'string',
+                        enum: ['always'],
+                    },
+                },
+                additionalProperties: false,
+            },
+        ],
     },
     create(context) {
         return {
@@ -145,6 +164,42 @@ const enforceColumnTypes = createRule({
                             propertyName,
                             expectedValue,
                             relation,
+                        },
+                        suggest: suggestions,
+                        loc: node.loc,
+                    });
+                }
+
+                // If specify relation is set to always, make sure that the typescript type is Relation<...>
+                if (context.options[0]?.specifyRelation === 'always' && !typescriptType.isWrapped) {
+                    const propertyName =
+                        node.key?.type === AST_NODE_TYPES.Identifier ? node.key.name : 'property';
+                    // Make expected value wrapped with Relation
+                    const fixReplace = typeToString(typeormType, {
+                        ...typescriptType,
+                        isWrapped: true,
+                    });
+                    const expectedValue = fixReplace ? ` (expected type: ${fixReplace})` : '';
+
+                    const suggestions: ReportSuggestionArray<EnforceColumnMessages> = [];
+                    if (fixReplace) {
+                        suggestions.push({
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            fix: (fixer) => fixer.replaceText(typeAnnotation, fixReplace),
+                            data: {
+                                propertyName,
+                                expectedValue: fixReplace,
+                            },
+                        });
+                    }
+
+                    // Report the error
+                    context.report({
+                        node,
+                        messageId: 'typescript_typeorm_relation_specify_relation_always',
+                        data: {
+                            propertyName,
+                            expectedValue,
                         },
                         suggest: suggestions,
                         loc: node.loc,

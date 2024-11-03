@@ -325,6 +325,30 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
+            name: 'should fail on mismatched one-to-one wrapped relations',
+            options: [{ specifyRelation: 'always' }],
+            code: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Other | null;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_specify_relation_always',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Relation<Other | null>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
             name: 'should fail on primitive one-to-one relations',
             code: `class Entity {
                 @OneToOne(() => Other)
@@ -478,6 +502,28 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
+            name: 'should fail on mismatched wrapped one-to-many relations',
+            options: [{ specifyRelation: 'always' }],
+            code: `class Entity {
+                    @OneToMany(() => Other, (other) => other.entity)
+                    others: Other[];
+                }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_specify_relation_always',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                    @OneToMany(() => Other, (other) => other.entity)
+                    others: Relation<Other[]>;
+                }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
             name: 'should fail on primitive one-to-many relations',
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
@@ -611,6 +657,28 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
+            name: 'should fail on mismatched wrapped many-to-one relations',
+            options: [{ specifyRelation: 'always' }],
+            code: `class Entity {
+                @ManyToOne(() => Other)
+                other: Other | null;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_specify_relation_always',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToOne(() => Other)
+                other: Relation<Other | null>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
             name: 'should fail on primitive many-to-one relations',
             code: `class Entity {
                 @ManyToOne(() => Other)
@@ -731,6 +799,30 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             errors: [
                 {
                     messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Relation<Other[]>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on specify relation always many-to-many relations',
+            options: [{ specifyRelation: 'always' }],
+            code: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Other[];
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_specify_relation_always',
                     suggestions: [
                         {
                             messageId: 'typescript_typeorm_relation_suggestion',
