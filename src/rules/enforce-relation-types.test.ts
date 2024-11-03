@@ -70,6 +70,22 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             }`,
         },
         {
+            name: 'should allow valid wrapped one-to-one relations',
+            code: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Relation<Other | null>;
+            }`,
+        },
+        {
+            name: 'should allow valid wrapped non-nullable one-to-one relations',
+            code: `class Entity {
+                @OneToOne(() => Other, { nullable: false })
+                @JoinColumn()
+                other: Relation<Other>;
+            }`,
+        },
+        {
             name: 'should allow valid one-to-many relations',
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
@@ -81,6 +97,13 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
                 others: Promise<Other[]>;
+            }`,
+        },
+        {
+            name: 'should allow wrapped one-to-many relations',
+            code: `class Entity {
+                @OneToMany(() => Other, (other) => other.entity)
+                others: Relation<Other[]>;
             }`,
         },
         {
@@ -126,6 +149,20 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             }`,
         },
         {
+            name: 'should allow valid wrapped many-to-one relations',
+            code: `class Entity {
+                @ManyToOne(() => Other)
+                other: Relation<Other | null>;
+            }`,
+        },
+        {
+            name: 'should allow valid wrapped non-nullable many-to-one relations',
+            code: `class Entity {
+                @ManyToOne(() => Other, { nullable: false })
+                other: Relation<Other>;
+            }`,
+        },
+        {
             name: 'should allow valid many-to-many relations',
             code: `class Entity {
                 @ManyToMany(() => Other)
@@ -139,6 +176,14 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
                 @ManyToMany(() => Other)
                 @JoinTable()
                 others: Promise<Other[]>;
+            }`,
+        },
+        {
+            name: 'should allow wrapped many-to-many relations',
+            code: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Relation<Other[]>;
             }`,
         },
     ],
@@ -234,7 +279,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: 'should fail on mismatched one-to-one promise relations',
+            name: 'should fail on mismatched one-to-one lazy relations',
             code: `class Entity {
                 @OneToOne(() => Other)
                 @JoinColumn()
@@ -250,6 +295,29 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
                 @OneToOne(() => Other)
                 @JoinColumn()
                 other: Promise<Other | null>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on mismatched one-to-one wrapped relations',
+            code: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Relation<Another | null>;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToOne(() => Other)
+                @JoinColumn()
+                other: Relation<Other | null>;
             }`,
                         },
                     ],
@@ -389,6 +457,27 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
+            name: 'should fail on mismatched wrapped one-to-many relations',
+            code: `class Entity {
+                    @OneToMany(() => Other, (other) => other.entity)
+                    others: Relation<Another[]>;
+                }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                    @OneToMany(() => Other, (other) => other.entity)
+                    others: Relation<Other[]>;
+                }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
             name: 'should fail on primitive one-to-many relations',
             code: `class Entity {
                 @OneToMany(() => Other, (other) => other.entity)
@@ -480,7 +569,7 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
             ],
         },
         {
-            name: 'should fail on mismatched many-to-one relations',
+            name: 'should fail on mismatched lazy many-to-one relations',
             code: `class Entity {
                 @ManyToOne(() => Other)
                 other: Promise<Another | null>;
@@ -494,6 +583,27 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
                             output: `class Entity {
                 @ManyToOne(() => Other)
                 other: Promise<Other | null>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on mismatched wrapped many-to-one relations',
+            code: `class Entity {
+                @ManyToOne(() => Other)
+                other: Relation<Another | null>;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToOne(() => Other)
+                other: Relation<Other | null>;
             }`,
                         },
                     ],
@@ -605,6 +715,29 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
                 @ManyToMany(() => Other)
                 @JoinTable()
                 others: Promise<Other[]>;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on mismatched wrapped many-to-many relations',
+            code: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Relation<Another[]>;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToMany(() => Other)
+                @JoinTable()
+                others: Relation<Other[]>;
             }`,
                         },
                     ],
