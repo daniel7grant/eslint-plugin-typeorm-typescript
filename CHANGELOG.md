@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.4.1] - 2024-11-24
+
 ### Added
 
 - Add support for [ESM Relation wrapper](https://typeorm.io/#relations-in-esm-projects) ([#16](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/pull/16), [#17](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/17), thanks to @lmeysel for initial implementation)

@@ -13,7 +13,7 @@ export const rules = {
 export const plugin: FlatConfig.Plugin = {
     meta: {
         name: 'eslint-plugin-typeorm-typescript',
-        version: '0.4.0',
+        version: '0.4.1',
     },
     rules,
 };
