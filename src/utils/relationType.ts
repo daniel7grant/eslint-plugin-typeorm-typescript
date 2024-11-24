@@ -6,6 +6,7 @@ interface RelationType {
     nullable: boolean;
     isArray: boolean;
     isLazy: boolean;
+    isWrapped: boolean;
 }
 
 export type Relation = 'OneToOne' | 'OneToMany' | 'ManyToOne' | 'ManyToMany';
@@ -21,11 +22,18 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                     isLazy: true,
                 };
             }
+            if (name === 'Relation' && param) {
+                return {
+                    ...convertTypeToRelationType(param),
+                    isWrapped: true,
+                };
+            }
             return {
                 name,
                 isArray: false,
                 isLazy: false,
                 nullable: false,
+                isWrapped: false,
             };
         }
         case AST_NODE_TYPES.TSArrayType: {
@@ -33,7 +41,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
             return { ...item, isArray: true };
         }
         case AST_NODE_TYPES.TSNullKeyword: {
-            return { name: '', isArray: false, isLazy: false, nullable: true };
+            return { name: '', isArray: false, isLazy: false, nullable: true, isWrapped: false };
         }
         case AST_NODE_TYPES.TSUnionType: {
             return arg.types.reduce(
@@ -43,6 +51,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                         name: acc.name || current.name,
                         isArray: acc.isArray || current.isArray,
                         isLazy: acc.isLazy || current.isLazy,
+                        isWrapped: acc.isWrapped || current.isWrapped,
                         nullable: acc.nullable || current.nullable,
                     };
                 },
@@ -51,11 +60,12 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                     isArray: false,
                     isLazy: false,
                     nullable: false,
+                    isWrapped: false,
                 } as RelationType,
             );
         }
         default: {
-            return { name: '', isArray: false, isLazy: false, nullable: false };
+            return { name: '', isArray: false, isLazy: false, nullable: false, isWrapped: false };
         }
     }
 }
@@ -72,7 +82,13 @@ export function convertArgumentToRelationType(
 
     // OneToMany, ManyToMany
     if (relation === 'OneToMany' || relation === 'ManyToMany') {
-        return { name: otherEntity, isArray: true, isLazy: false, nullable: false };
+        return {
+            name: otherEntity,
+            isArray: true,
+            isLazy: false,
+            isWrapped: false,
+            nullable: false,
+        };
     }
     // OneToOne, ManyToOne
     const options = findObjectArgument(restArguments);
@@ -82,6 +98,7 @@ export function convertArgumentToRelationType(
         name: otherEntity,
         isArray: false,
         isLazy: false,
+        isWrapped: false,
         nullable: parsedOptions?.nullable ?? true,
     };
 }
@@ -107,13 +124,19 @@ export function isTypeMissingArray(toType: RelationType, tsType: RelationType): 
     return toType.name === tsType.name && toType.isArray && !tsType.isArray;
 }
 
-export function typeToString(relation: RelationType, { isLazy }: RelationType): string | undefined {
+export function typeToString(
+    relation: RelationType,
+    { isLazy, isWrapped }: RelationType,
+): string | undefined {
     let result = relation.name;
     if (relation.isArray) {
         result += '[]';
     }
     if (relation.nullable) {
         result += ' | null';
+    }
+    if (isWrapped) {
+        result = `Relation<${result}>`;
     }
     if (isLazy) {
         result = `Promise<${result}>`;

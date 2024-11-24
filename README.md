@@ -133,12 +133,18 @@ TypeORM relation types and TypeScript types should be consistent. Because the na
 that `ManyToOne` should be singular, and `OneToMany` an array. Additionally, `OneToOne` and `ManyToOne` are nullable,
 which is an easy mistake to make.
 
+This rule also supports the [ESM Relation wrapper](https://typeorm.io/#relations-in-esm-projects). If you are using ES Modules
+and want to avoid circular dependency issues, you can set `specifyRelation` to always to make sure that relations are always
+wrapped with `Relation<...>`.
+
 #### Configuration
 
 ```json
 {
   "rules": {
-    "typeorm-typescript/enforce-relation-types": "error"
+    "typeorm-typescript/enforce-relation-types": "error",
+    // If you want to force setting Relation<...> everywhere
+    "typeorm-typescript/enforce-relation-types": ["error", { "specifyRelation": "always" }],
   }
 }
 ```
