@@ -7,6 +7,10 @@
 - Add support for [ESM Relation wrapper](https://typeorm.io/#relations-in-esm-projects) ([#16](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/pull/16), [#17](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/17), thanks to @lmeysel for initial implementation)
 - Add option to `enforce-relation-type` to make sure that relation wrapper is specified everywhere
 
+### Changed
+
+- Update dependencies to fix critical issue in `cross-spawn` and `@eslint/plugin-kit`
+
 ## [0.4.0] - 2024-08-09
 
 ### Added
