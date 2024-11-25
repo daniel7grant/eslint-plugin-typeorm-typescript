@@ -76,9 +76,10 @@ but columns aren't), it makes it easy to make mistakes. These ESLint rules will 
 
 ### typeorm-typescript/enforce-column-types
 
-TypeORM data types and TypeScript types should be consistent. It includes the primitive types (e.g. `VARCHAR` -> `string`)
-and the nullability. By default columns are non-nullable, but if the `nullable: true` option is set, it should be unioned
-with `null` in the TypeScript types too.
+TypeORM data types and TypeScript types should be consistent. It checks the primitive types (e.g. `VARCHAR` -> `string`)
+and driver-specific types. By most drivers, `bigint` and `decimal` are parsed as string, except in SQLite (set the `driver`
+option, if you use SQLite). This rule checks the nullability too: by default columns are non-nullable, but if the `nullable: true`
+option is set, it should be unioned with `null` in the TypeScript types as well.
 
 It also handle primary columns (`number` by default), create and update columns (`date` by default) and delete columns
 (`date` and nullable by default).
@@ -88,7 +89,9 @@ It also handle primary columns (`number` by default), create and update columns 
 ```json
 {
   "rules": {
-    "typeorm-typescript/enforce-column-types": "error"
+    "typeorm-typescript/enforce-column-types": "error",
+    // If you are using SQLite, set the driver
+    "typeorm-typescript/enforce-relation-types": ["error", { "driver": "sqlite" }],
   }
 }
 ```

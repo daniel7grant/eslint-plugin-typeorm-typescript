@@ -50,6 +50,36 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
+            name: 'should allow matching decimal column types',
+            code: `class Entity {
+                @Column({ type: 'decimal' })
+                decimal: string;
+            }`,
+        },
+        {
+            name: 'should allow matching bigint column types',
+            code: `class Entity {
+                @Column({ type: 'bigint' })
+                big: string;
+            }`,
+        },
+        {
+            name: 'should allow matching decimal column types in SQLite',
+            code: `class Entity {
+                @Column({ type: 'decimal' })
+                decimal: number;
+            }`,
+            options: [{ driver: 'sqlite' }],
+        },
+        {
+            name: 'should allow matching bigint column types in SQLite',
+            code: `class Entity {
+                @Column({ type: 'bigint' })
+                big: number;
+            }`,
+            options: [{ driver: 'sqlite' }],
+        },
+        {
             name: 'should allow matching bool column types',
             code: `class Entity {
                 @Column({ type: 'boolean' })
@@ -360,6 +390,92 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
                             output: `class Entity {
                 @Column({ type: 'string' })
                 str: string;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-string TypeScript type with decimal type',
+            code: `class Entity {
+                @Column({ type: 'decimal' })
+                num: number;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'decimal' })
+                num: string;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-string TypeScript type with bigint type',
+            code: `class Entity {
+                @Column({ type: 'bigint' })
+                num: number;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'bigint' })
+                num: string;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-number TypeScript type with decimal type in SQLite',
+            code: `class Entity {
+                @Column({ type: 'decimal' })
+                num: string;
+            }`,
+            options: [{ driver: 'sqlite' }],
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'decimal' })
+                num: number;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on non-number TypeScript type with bigint type in SQLite',
+            code: `class Entity {
+                @Column({ type: 'bigint' })
+                num: string;
+            }`,
+            options: [{ driver: 'sqlite' }],
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_column_mismatch',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_column_suggestion',
+                            output: `class Entity {
+                @Column({ type: 'bigint' })
+                num: number;
             }`,
                         },
                     ],

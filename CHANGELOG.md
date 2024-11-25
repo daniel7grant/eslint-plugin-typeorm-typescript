@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking**: `bigint` and `decimal` are now parsed correctly according to the driver ([#5](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/5#issuecomment-2452988205))
+    - There is new option `driver` for `enforce-column-types`: can be 'postgres', 'mysql' or 'sqlite'
+    - If the driver is empty (default) or set to MySQL and PostgreSQL, bigint and decimal are parsed to be strings
+    - If the driver is set to SQLite, bigint and decimal are parsed to be numbers
+    - For more information, see [#5](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/5#issuecomment-2455779084)
+
 ## [0.4.1] - 2024-11-24
 
 ### Added

@@ -38,9 +38,6 @@ interface ColumnParameter {
 // From: https://github.com/typeorm/typeorm/blob/master/src/driver/types/ColumnTypes.ts
 const booleanLike = ['boolean', 'bool'];
 const numberLike = [
-    'bigint',
-    'dec',
-    'decimal',
     'fixed',
     'int',
     'int2',
@@ -54,7 +51,6 @@ const numberLike = [
     'smallint',
     'tinyint',
     'dec',
-    'decimal',
     'double precision',
     'double',
     'fixed',
@@ -64,6 +60,9 @@ const numberLike = [
     'real',
     'smalldecimal',
 ];
+// These are numbers that depend on the driver if parsed to a string (MySQL, PostgreSQL) or number (SQLite)
+// @see https://typeorm.io/entities#column-types, https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/5
+const weirdNumberLike = ['bigint', 'dec', 'decimal'];
 const stringLike = [
     'character varying',
     'varying character',
@@ -107,12 +106,15 @@ const dateLike = [
     'year',
 ];
 
-function convertTypeOrmToColumnType(arg: string): ColumnTypeString {
+function convertTypeOrmToColumnType(arg: string, driver?: string): ColumnTypeString {
     if (booleanLike.includes(arg)) {
         return 'boolean';
     }
     if (numberLike.includes(arg)) {
         return 'number';
+    }
+    if (weirdNumberLike.includes(arg)) {
+        return driver === 'sqlite' ? 'number' : 'string';
     }
     if (stringLike.includes(arg)) {
         return 'string';
@@ -143,6 +145,7 @@ export function getDefaultColumnTypeForDecorator(column: Column): ColumnParamete
 export function convertArgumentToColumnType(
     column: Column,
     args: TSESTree.CallExpressionArgument[],
+    driver?: string,
 ): ColumnType {
     const parsed = args.reduce((prev, arg) => {
         switch (arg.type) {
@@ -160,7 +163,7 @@ export function convertArgumentToColumnType(
     return {
         columnType:
             parsed.type && !parsed.transformer
-                ? convertTypeOrmToColumnType(parsed.type)
+                ? convertTypeOrmToColumnType(parsed.type, driver)
                 : 'unknown',
         nullable: parsed.nullable ?? false,
         literal: false,

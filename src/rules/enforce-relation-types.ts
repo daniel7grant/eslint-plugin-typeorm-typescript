@@ -19,7 +19,7 @@ const createRule = ESLintUtils.RuleCreator(
         `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#typeorm-typescript${name}`,
 );
 
-type EnforceColumnMessages =
+type EnforceRelationMessages =
     | 'typescript_typeorm_relation_missing'
     | 'typescript_typeorm_relation_mismatch'
     | 'typescript_typeorm_relation_array_to_many'
@@ -27,13 +27,13 @@ type EnforceColumnMessages =
     | 'typescript_typeorm_relation_nullable_by_default'
     | 'typescript_typeorm_relation_nullable_by_default_suggestion'
     | 'typescript_typeorm_relation_specify_relation_always';
-type Options = [
+type EnforceRelationOptions = [
     {
         specifyRelation?: 'always';
     },
 ];
 
-const enforceColumnTypes = createRule<Options, EnforceColumnMessages>({
+const enforceRelationTypes = createRule<EnforceRelationOptions, EnforceRelationMessages>({
     name: 'enforce-relation-types',
     defaultOptions: [{}],
     meta: {
@@ -111,8 +111,8 @@ const enforceColumnTypes = createRule<Options, EnforceColumnMessages>({
                 const typescriptType = convertTypeToRelationType(typeAnnotation);
 
                 if (!isTypesEqual(typeormType, typescriptType)) {
-                    let messageId: EnforceColumnMessages = 'typescript_typeorm_relation_mismatch';
-                    const suggestions: ReportSuggestionArray<EnforceColumnMessages> = [];
+                    let messageId: EnforceRelationMessages = 'typescript_typeorm_relation_mismatch';
+                    const suggestions: ReportSuggestionArray<EnforceRelationMessages> = [];
                     const fixReplace = typeToString(typeormType, typescriptType);
 
                     // Construct strings for error message
@@ -181,7 +181,7 @@ const enforceColumnTypes = createRule<Options, EnforceColumnMessages>({
                     });
                     const expectedValue = fixReplace ? ` (expected type: ${fixReplace})` : '';
 
-                    const suggestions: ReportSuggestionArray<EnforceColumnMessages> = [];
+                    const suggestions: ReportSuggestionArray<EnforceRelationMessages> = [];
                     if (fixReplace) {
                         suggestions.push({
                             messageId: 'typescript_typeorm_relation_suggestion',
@@ -210,4 +210,4 @@ const enforceColumnTypes = createRule<Options, EnforceColumnMessages>({
     },
 });
 
-export default enforceColumnTypes;
+export default enforceRelationTypes;

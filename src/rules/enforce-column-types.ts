@@ -19,9 +19,20 @@ const createRule = ESLintUtils.RuleCreator(
         `https://github.com/daniel7grant/eslint-plugin-typeorm-typescript#typeorm-typescript${name}`,
 );
 
-const enforceColumnTypes = createRule({
+type EnforceColumnMessages =
+    | 'typescript_typeorm_column_mismatch'
+    | 'typescript_typeorm_column_mismatch_weird'
+    | 'typescript_typeorm_column_suggestion';
+
+type EnforceColumnOptions = [
+    {
+        driver?: 'postgres' | 'mysql' | 'sqlite';
+    },
+];
+
+const enforceColumnTypes = createRule<EnforceColumnOptions, EnforceColumnMessages>({
     name: 'enforce-column-types',
-    defaultOptions: [],
+    defaultOptions: [{}],
     meta: {
         type: 'problem',
         docs: {
@@ -31,10 +42,23 @@ const enforceColumnTypes = createRule({
         messages: {
             typescript_typeorm_column_mismatch:
                 'Type of {{ propertyName }}{{ className }} is not matching the TypeORM column type{{ expectedValue }}.',
+            typescript_typeorm_column_mismatch_weird:
+                'Type of {{ propertyName }}{{ className }} should be string, as decimals and bigints are encoded as strings by PostgreSQL and MySQL drivers. If you are using SQLite, change the driver option to sqlite.',
             typescript_typeorm_column_suggestion:
                 'Change the type of {{ propertyName }} to {{ expectedValue }}.',
         },
-        schema: [],
+        schema: [
+            {
+                type: 'object',
+                properties: {
+                    driver: {
+                        type: 'string',
+                        enum: ['postgres', 'mysql', 'sqlite'],
+                    },
+                },
+                additionalProperties: false,
+            },
+        ],
     },
     create(context) {
         return {
@@ -52,7 +76,11 @@ const enforceColumnTypes = createRule({
                     return;
                 }
                 const [column, colArguments] = columnArguments;
-                const typeormType = convertArgumentToColumnType(column, colArguments);
+                const typeormType = convertArgumentToColumnType(
+                    column,
+                    colArguments,
+                    context.options?.[0]?.driver,
+                );
 
                 const { typeAnnotation } = node.typeAnnotation;
                 let typescriptType: ColumnType;
