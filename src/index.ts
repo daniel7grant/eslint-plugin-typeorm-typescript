@@ -2,7 +2,6 @@ import { FlatConfig } from '@typescript-eslint/utils/ts-eslint';
 import enforceColumnTypes from './rules/enforce-column-types.js';
 import enforceConsistentNullability from './rules/enforce-consistent-nullability.js';
 import enforceRelationTypes from './rules/enforce-relation-types.js';
-import recommended from './recommended.js';
 
 export const rules = {
     'enforce-column-types': enforceColumnTypes,
@@ -17,7 +16,5 @@ export const plugin: FlatConfig.Plugin = {
     },
     rules,
 };
-
-export { recommended };
 
 export default plugin;
