@@ -49,7 +49,7 @@ export default tseslint.config(
 );
 ```
 
-For more information, see an example of the [recommended configuration](./examples/recommended/).
+For more information, see an example of the [recommended configuration](./examples/recommended/) or the [customized configuration](./examples/customized/).
 
 ### Legacy configuration
 
