@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Fix circular dependecy issue between plugin and recommended, making customization fail
+    - Add `customized` example (with tests) to display the customization options
 - **Breaking**: `bigint` and `decimal` are now parsed correctly according to the driver ([#5](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/5#issuecomment-2452988205))
     - There is new option `driver` for `enforce-column-types`: can be 'postgres', 'mysql' or 'sqlite'
     - If the driver is empty (default) or set to MySQL and PostgreSQL, bigint and decimal are parsed to be strings

@@ -24,14 +24,19 @@ jobs:
         run: npm test
       - name: Build TypeScript files
         run: npm run build
-      - name: Test ESLint 9 example for compatibility
+      - name: Test ESLint 9 recommended example for compatibility
         run: |
           cd examples/recommended
           npm ci
           (npm run lint || true) | grep -aq "Type of name in User is not matching the TypeORM column type (expected type: string)"
+      - name: Test ESLint 9 customized example for compatibility
+        run: |
+          cd examples/customized
+          npm ci
+          (npm run lint || true) | grep -aq "The nullability of name in User should be set to the default value"
       - name: Test legacy example for compatibility
         run: |
-          # Workaround until they fix scoping
+          # Workaround for scoping preferring new config files
           mv eslint.config.mjs _eslint.config.mjs
           cd examples/legacy
           npm ci

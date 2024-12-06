@@ -1,0 +1,24 @@
+{
+  "name": "customized",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint -c eslint.config.mjs index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.3.0",
+    "eslint": "^9.3.0",
+    "eslint-plugin-typeorm-typescript": "file:../..",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.0.1"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.20"
+  }
+}
