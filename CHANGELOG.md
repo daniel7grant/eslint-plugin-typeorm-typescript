@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2024-12-06
+
 ### Changed
 
 - Fix circular dependecy issue between plugin and recommended, making customization fail
