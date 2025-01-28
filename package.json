@@ -45,15 +45,16 @@
         "@types/node": "^22.1.0",
         "@typescript-eslint/rule-tester": "^8.0.0",
         "eslint": "^9.8.0",
-        "eslint-config-prettier": "^9.0.0",
+        "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-prettier": "^5.0.1",
         "prettier": "^3.1.0",
         "typescript-eslint": "^8.0.0",
-        "vitest": "^2.0.5"
+        "vitest": "^3.0.4"
     },
     "dependencies": {
         "@typescript-eslint/parser": "^8.0.0",
         "@typescript-eslint/utils": "^8.0.0",
-        "typescript": "^5.5.4"
+        "typescript": "^5.5.4",
+        "vite": "^6.0.11"
     }
 }
