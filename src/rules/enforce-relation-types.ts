@@ -26,10 +26,12 @@ type EnforceRelationMessages =
     | 'typescript_typeorm_relation_suggestion'
     | 'typescript_typeorm_relation_nullable_by_default'
     | 'typescript_typeorm_relation_nullable_by_default_suggestion'
-    | 'typescript_typeorm_relation_specify_relation_always';
+    | 'typescript_typeorm_relation_specify_relation_always'
+    | 'typescript_typeorm_relation_specify_undefined_always';
 type EnforceRelationOptions = [
     {
         specifyRelation?: 'always';
+        specifyUndefined?: 'always';
     },
 ];
 
@@ -57,12 +59,18 @@ const enforceRelationTypes = createRule<EnforceRelationOptions, EnforceRelationM
                 'Make the {{ relation }} relation nullable: false.',
             typescript_typeorm_relation_specify_relation_always:
                 'To avoid circular dependencies, wrap your type of {{ propertyName }} with `Relation`{{ expectedValue }}.',
+            typescript_typeorm_relation_specify_undefined_always:
+                'TypeORM relations are undefined by default. Type of {{ propertyName }} should be undefined{{ expectedValue }}.',
         },
         schema: [
             {
                 type: 'object',
                 properties: {
                     specifyRelation: {
+                        type: 'string',
+                        enum: ['always'],
+                    },
+                    specifyUndefined: {
                         type: 'string',
                         enum: ['always'],
                     },
@@ -109,6 +117,8 @@ const enforceRelationTypes = createRule<EnforceRelationOptions, EnforceRelationM
                 }
                 const { typeAnnotation } = node.typeAnnotation;
                 const typescriptType = convertTypeToRelationType(typeAnnotation);
+                typescriptType.isOptionalUndefined =
+                    typescriptType.isOptionalUndefined || node.optional;
 
                 if (!isTypesEqual(typeormType, typescriptType)) {
                     let messageId: EnforceRelationMessages = 'typescript_typeorm_relation_mismatch';
@@ -197,6 +207,46 @@ const enforceRelationTypes = createRule<EnforceRelationOptions, EnforceRelationM
                     context.report({
                         node,
                         messageId: 'typescript_typeorm_relation_specify_relation_always',
+                        data: {
+                            propertyName,
+                            expectedValue,
+                        },
+                        suggest: suggestions,
+                        loc: node.loc,
+                    });
+                }
+
+                // If specify undefined is set to always, make sure that the typescript type can be undefined unless it is a lazy or eager relation
+                if (
+                    context.options[0]?.specifyUndefined === 'always' &&
+                    typescriptType.isOptionalUndefined === typeormType.isEager &&
+                    !typescriptType.isLazy
+                ) {
+                    const propertyName =
+                        node.key?.type === AST_NODE_TYPES.Identifier ? node.key.name : 'property';
+                    // Make expected value unioned with undefined or optional (if not eager)
+                    const fixReplace = typeToString(typeormType, {
+                        ...typescriptType,
+                        isOptionalUndefined: !typeormType.isEager,
+                    });
+                    const expectedValue = fixReplace ? ` (expected type: ${fixReplace})` : '';
+
+                    const suggestions: ReportSuggestionArray<EnforceRelationMessages> = [];
+                    if (fixReplace) {
+                        suggestions.push({
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            fix: (fixer) => fixer.replaceText(typeAnnotation, fixReplace),
+                            data: {
+                                propertyName,
+                                expectedValue: fixReplace,
+                            },
+                        });
+                    }
+
+                    // Report the error
+                    context.report({
+                        node,
+                        messageId: 'typescript_typeorm_relation_specify_undefined_always',
                         data: {
                             propertyName,
                             expectedValue,

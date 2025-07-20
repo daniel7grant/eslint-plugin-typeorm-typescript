@@ -136,6 +136,10 @@ TypeORM relation types and TypeScript types should be consistent. Because the na
 that `ManyToOne` should be singular, and `OneToMany` an array. Additionally, `OneToOne` and `ManyToOne` are nullable,
 which is an easy mistake to make.
 
+Another common issue with TypeORM is not specifying a relation when querying. One way to avoid this is to check for `undefined`
+when accessing any relation. Set `specifyUndefined` to always, so all relations have to be marked as `undefined`, forcing the
+null-check every time.
+
 This rule also supports the [ESM Relation wrapper](https://typeorm.io/#relations-in-esm-projects). If you are using ES Modules
 and want to avoid circular dependency issues, you can set `specifyRelation` to always to make sure that relations are always
 wrapped with `Relation<...>`.
@@ -146,6 +150,8 @@ wrapped with `Relation<...>`.
 {
   "rules": {
     "typeorm-typescript/enforce-relation-types": "error",
+    // If you want to force null-checking before accessing a relation 
+    "typeorm-typescript/enforce-relation-types": ["error", { "specifyUndefined": "always" }],
     // If you want to force setting Relation<...> everywhere
     "typeorm-typescript/enforce-relation-types": ["error", { "specifyRelation": "always" }],
   }
@@ -180,6 +186,11 @@ class Entity {
     @OneToOne(() => Other)
     @JoinColumn()
     other: Another | null;
+
+    // Must add undefined with specifyUndefined: always
+    @ManyToMany(() => Other)
+    @JoinTable()
+    other: Other;
 }
 ```
 
@@ -200,6 +211,11 @@ class Entity {
     // *ToMany rules are an array
     @OneToMany(() => Other, (other) => other.entity)
     others: Other[];
+
+    // Undefined added with specifyUndefined: always
+    @ManyToMany(() => Other)
+    @JoinTable()
+    other: Other | undefined;
 }
 ```
 
