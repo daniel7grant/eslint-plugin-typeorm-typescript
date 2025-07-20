@@ -216,18 +216,18 @@ const enforceRelationTypes = createRule<EnforceRelationOptions, EnforceRelationM
                     });
                 }
 
-                // If specify undefined is set to always, make sure that the typescript type can be undefined unless it is a lazy relation
+                // If specify undefined is set to always, make sure that the typescript type can be undefined unless it is a lazy or eager relation
                 if (
                     context.options[0]?.specifyUndefined === 'always' &&
-                    !typescriptType.isOptionalUndefined &&
+                    typescriptType.isOptionalUndefined === typeormType.isEager &&
                     !typescriptType.isLazy
                 ) {
                     const propertyName =
                         node.key?.type === AST_NODE_TYPES.Identifier ? node.key.name : 'property';
-                    // Make expected value unioned with undefined or optional
+                    // Make expected value unioned with undefined or optional (if not eager)
                     const fixReplace = typeToString(typeormType, {
                         ...typescriptType,
-                        isOptionalUndefined: true,
+                        isOptionalUndefined: !typeormType.isEager,
                     });
                     const expectedValue = fixReplace ? ` (expected type: ${fixReplace})` : '';
 

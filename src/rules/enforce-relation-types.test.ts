@@ -229,6 +229,15 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
                 other: Promise<Other>;
             }`,
         },
+        {
+            name: 'should allow omission of undefined for eager relations',
+            options: [{ specifyUndefined: 'always' }],
+            code: `class Entity {
+                @OneToOne(() => Other, (other) => other.entity, { nullable: false, eager: true })
+                @JoinColumn()
+                other: Other;
+            }`,
+        },
     ],
     invalid: [
         {
@@ -964,6 +973,74 @@ ruleTester.run('enforce-relation-types', enforceRelationTypes, {
                 @OneToOne(() => Other, (other) => other.entity)
                 @JoinColumn()
                 other: Other | null | undefined;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on undefined eager one-to-many relations ',
+            options: [{ specifyUndefined: 'always' }],
+            code: `class Entity {
+                @OneToMany(() => Other, (other) => other.entity, { eager: true })
+                others: Other[] | undefined;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_specify_undefined_always',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToMany(() => Other, (other) => other.entity, { eager: true })
+                others: Other[];
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on undefined eager many-to-one relations ',
+            options: [{ specifyUndefined: 'always' }],
+            code: `class Entity {
+                @ManyToOne(() => Other, { nullable: false, eager: true })
+                other: Other | undefined;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_specify_undefined_always',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @ManyToOne(() => Other, { nullable: false, eager: true })
+                other: Other;
+            }`,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
+            name: 'should fail on undefined eager one-to-one relations ',
+            options: [{ specifyUndefined: 'always' }],
+            code: `class Entity {
+                @OneToOne(() => Other, (other) => other.entity, { eager: true })
+                @JoinColumn()
+                other: Other | null | undefined;
+            }`,
+            errors: [
+                {
+                    messageId: 'typescript_typeorm_relation_specify_undefined_always',
+                    suggestions: [
+                        {
+                            messageId: 'typescript_typeorm_relation_suggestion',
+                            output: `class Entity {
+                @OneToOne(() => Other, (other) => other.entity, { eager: true })
+                @JoinColumn()
+                other: Other | null;
             }`,
                         },
                     ],

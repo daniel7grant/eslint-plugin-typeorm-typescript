@@ -6,6 +6,7 @@ interface RelationType {
     nullable: boolean;
     isArray: boolean;
     isLazy: boolean;
+    isEager: boolean;
     isWrapped: boolean;
     isOptionalUndefined: boolean;
 }
@@ -33,6 +34,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                 name,
                 isArray: false,
                 isLazy: false,
+                isEager: false,
                 nullable: false,
                 isWrapped: false,
                 isOptionalUndefined: false,
@@ -47,6 +49,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                 name: '',
                 isArray: false,
                 isLazy: false,
+                isEager: false,
                 nullable: true,
                 isWrapped: false,
                 isOptionalUndefined: false,
@@ -57,6 +60,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                 name: '',
                 isArray: false,
                 isLazy: false,
+                isEager: false,
                 nullable: false,
                 isWrapped: false,
                 isOptionalUndefined: true,
@@ -70,6 +74,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                         name: acc.name || current.name,
                         isArray: acc.isArray || current.isArray,
                         isLazy: acc.isLazy || current.isLazy,
+                        isEager: acc.isEager || current.isEager,
                         isWrapped: acc.isWrapped || current.isWrapped,
                         nullable: acc.nullable || current.nullable,
                         isOptionalUndefined: acc.isOptionalUndefined || current.isOptionalUndefined,
@@ -79,6 +84,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                     name: '',
                     isArray: false,
                     isLazy: false,
+                    isEager: false,
                     nullable: false,
                     isWrapped: false,
                     isOptionalUndefined: false,
@@ -90,6 +96,7 @@ export function convertTypeToRelationType(arg: TSESTree.TypeNode): RelationType 
                 name: '',
                 isArray: false,
                 isLazy: false,
+                isEager: false,
                 nullable: false,
                 isWrapped: false,
                 isOptionalUndefined: false,
@@ -108,25 +115,29 @@ export function convertArgumentToRelationType(
         return undefined;
     }
 
+    const options = findObjectArgument(restArguments);
+    const parsedOptions = parseObjectLiteral(options) as
+        | { nullable?: boolean; eager?: boolean }
+        | undefined;
+
     // OneToMany, ManyToMany
     if (relation === 'OneToMany' || relation === 'ManyToMany') {
         return {
             name: otherEntity,
             isArray: true,
             isLazy: false,
+            isEager: parsedOptions?.eager ?? false,
             isWrapped: false,
             nullable: false,
             isOptionalUndefined: false,
         };
     }
     // OneToOne, ManyToOne
-    const options = findObjectArgument(restArguments);
-    const parsedOptions = parseObjectLiteral(options) as { nullable?: boolean } | undefined;
-
     return {
         name: otherEntity,
         isArray: false,
         isLazy: false,
+        isEager: parsedOptions?.eager ?? false,
         isWrapped: false,
         nullable: parsedOptions?.nullable ?? true,
         isOptionalUndefined: false,
