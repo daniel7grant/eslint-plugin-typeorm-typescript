@@ -6,7 +6,7 @@
 
 ### Added 
 
-- Add support for forcing all relations to be undefined by default ([#23](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/pull/23))
+- Add support for forcing all relations to be undefined by default ([#23](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/pull/23) by @davidenwang)
 
 ### Changed
 
