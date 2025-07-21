@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2025-07-21
+
 ### Added 
 
 - Add support for forcing all relations to be undefined by default ([#23](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/pull/23))
