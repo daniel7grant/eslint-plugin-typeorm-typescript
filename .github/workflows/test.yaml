@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        version: [18, 20, 22]
+        version: [18, 20, 22, 24]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
