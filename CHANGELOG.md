@@ -10,6 +10,7 @@
 
 - Allow PrimaryColumn to support any type, as opposed to defaulting to integers ([#21](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/21))
 - Add custom error message for bigints and decimals to make it clearer that it's not a false positive ([#22](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/issues/22))
+- Update dependencies, most importantly Vite 6 to Vite 7
 
 ## [0.5.0] - 2024-12-06
 
