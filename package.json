@@ -24,6 +24,7 @@
         "postbuild:cjs": "sed -i 's/\"type\": \"commonjs\"/\"type\": \"module\"/' package.json",
         "build:es": "tsc -p tsconfig.es.json",
         "build": "npm run build:cjs && npm run build:es",
+        "watch": "tsc --watch -p tsconfig.es.json",
         "lint": "eslint src/",
         "test": "vitest run"
     },

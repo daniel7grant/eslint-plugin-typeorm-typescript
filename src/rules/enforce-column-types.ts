@@ -22,6 +22,7 @@ const createRule = ESLintUtils.RuleCreator(
 type EnforceColumnMessages =
     | 'typescript_typeorm_column_mismatch'
     | 'typescript_typeorm_column_mismatch_weird'
+    | 'typescript_typeorm_column_mismatch_weird_sqlite'
     | 'typescript_typeorm_column_suggestion';
 
 type EnforceColumnOptions = [
@@ -43,7 +44,9 @@ const enforceColumnTypes = createRule<EnforceColumnOptions, EnforceColumnMessage
             typescript_typeorm_column_mismatch:
                 'Type of {{ propertyName }}{{ className }} is not matching the TypeORM column type{{ expectedValue }}.',
             typescript_typeorm_column_mismatch_weird:
-                'Type of {{ propertyName }}{{ className }} should be string, as decimals and bigints are encoded as strings by PostgreSQL and MySQL drivers. If you are using SQLite, change the driver option to sqlite.',
+                'Type of {{ propertyName }}{{ className }} should be string, because decimals and bigints might be too big for numbers, so they are encoded as strings by PostgreSQL and MySQL drivers. If you are using SQLite, change the driver option to sqlite.',
+            typescript_typeorm_column_mismatch_weird_sqlite:
+                'Type of {{ propertyName }}{{ className }} should be number, as decimals and bigints are encoded as numbers by SQLite. If you are not using SQLite, remove the driver option.',
             typescript_typeorm_column_suggestion:
                 'Change the type of {{ propertyName }} to {{ expectedValue }}.',
         },
@@ -110,16 +113,24 @@ const enforceColumnTypes = createRule<EnforceColumnOptions, EnforceColumnMessage
                     const fixReplace = typeToString(typeormType, typescriptType);
 
                     // Construct strings for error message
+                    let messageId: EnforceColumnMessages = 'typescript_typeorm_column_mismatch';
                     const propertyName =
                         node.key?.type === AST_NODE_TYPES.Identifier ? node.key.name : 'property';
                     const classObject = findParentClass(node);
                     const className = classObject?.id ? ` in ${classObject.id.name}` : '';
                     const expectedValue = fixReplace ? ` (expected type: ${fixReplace})` : '';
 
+                    if (typeormType.isWeirdNumber) {
+                        messageId =
+                            context.options?.[0]?.driver === 'sqlite'
+                                ? 'typescript_typeorm_column_mismatch_weird_sqlite'
+                                : 'typescript_typeorm_column_mismatch_weird';
+                    }
+
                     // Report the error
                     context.report({
                         node,
-                        messageId: 'typescript_typeorm_column_mismatch',
+                        messageId,
                         data: {
                             className,
                             propertyName,

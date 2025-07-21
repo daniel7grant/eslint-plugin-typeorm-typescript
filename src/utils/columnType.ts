@@ -26,6 +26,7 @@ export interface ColumnType {
     nullable: boolean;
     literal: boolean;
     array: boolean;
+    isWeirdNumber: boolean;
 }
 
 interface ColumnParameter {
@@ -127,7 +128,6 @@ function convertTypeOrmToColumnType(arg: string, driver?: string): ColumnTypeStr
 
 export function getDefaultColumnTypeForDecorator(column: Column): ColumnParameter {
     switch (column) {
-        case 'PrimaryColumn':
         case 'PrimaryGeneratedColumn':
         case 'VersionColumn':
             return { type: 'integer', nullable: false };
@@ -136,6 +136,7 @@ export function getDefaultColumnTypeForDecorator(column: Column): ColumnParamete
             return { type: 'datetime', nullable: false };
         case 'DeleteDateColumn':
             return { type: 'datetime', nullable: true };
+        case 'PrimaryColumn':
         case 'Column':
         default:
             return {};
@@ -168,6 +169,7 @@ export function convertArgumentToColumnType(
         nullable: parsed.nullable ?? false,
         literal: false,
         array: parsed.array ?? false,
+        isWeirdNumber: parsed.type ? weirdNumberLike.includes(parsed.type) : false,
     };
 }
 
@@ -175,20 +177,44 @@ export function convertTsTypeToColumnType(arg: TypeNode, checker: TypeChecker): 
     switch (arg.kind) {
         case SyntaxKind.TemplateLiteralType:
         case SyntaxKind.StringKeyword:
-            return { columnType: 'string', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'string',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
 
         case SyntaxKind.NumberKeyword:
         case SyntaxKind.BigIntKeyword:
-            return { columnType: 'number', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'number',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
 
         case SyntaxKind.BooleanKeyword:
-            return { columnType: 'boolean', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'boolean',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
 
         case SyntaxKind.TypeReference:
             if (isTypeReferenceNode(arg)) {
                 const symbol = checker.getTypeAtLocation(arg.typeName).getSymbol();
                 if (symbol?.getName() === 'Date') {
-                    return { columnType: 'Date', nullable: false, literal: false, array: false };
+                    return {
+                        columnType: 'Date',
+                        nullable: false,
+                        literal: false,
+                        array: false,
+                        isWeirdNumber: false,
+                    };
                 }
             }
             break;
@@ -197,17 +223,41 @@ export function convertTsTypeToColumnType(arg: TypeNode, checker: TypeChecker): 
             const literal = arg as LiteralTypeNode;
             switch (literal.literal.kind) {
                 case SyntaxKind.NullKeyword:
-                    return { columnType: 'unknown', nullable: true, literal: false, array: false };
+                    return {
+                        columnType: 'unknown',
+                        nullable: true,
+                        literal: false,
+                        array: false,
+                        isWeirdNumber: false,
+                    };
 
                 case SyntaxKind.StringLiteral:
-                    return { columnType: 'string', nullable: false, literal: true, array: false };
+                    return {
+                        columnType: 'string',
+                        nullable: false,
+                        literal: true,
+                        array: false,
+                        isWeirdNumber: false,
+                    };
 
                 case SyntaxKind.NumericLiteral:
-                    return { columnType: 'number', nullable: false, literal: true, array: false };
+                    return {
+                        columnType: 'number',
+                        nullable: false,
+                        literal: true,
+                        array: false,
+                        isWeirdNumber: false,
+                    };
 
                 case SyntaxKind.TrueKeyword:
                 case SyntaxKind.FalseKeyword:
-                    return { columnType: 'boolean', nullable: false, literal: true, array: false };
+                    return {
+                        columnType: 'boolean',
+                        nullable: false,
+                        literal: true,
+                        array: false,
+                        isWeirdNumber: false,
+                    };
 
                 default:
                     break;
@@ -232,6 +282,7 @@ export function convertTsTypeToColumnType(arg: TypeNode, checker: TypeChecker): 
                         nullable: current.nullable || acc.nullable,
                         literal: current.literal || acc.literal,
                         array: current.array || acc.array,
+                        isWeirdNumber: current.isWeirdNumber || acc.isWeirdNumber,
                     };
                 },
                 {
@@ -239,35 +290,84 @@ export function convertTsTypeToColumnType(arg: TypeNode, checker: TypeChecker): 
                     nullable: false,
                     literal: false,
                     array: false,
+                    isWeirdNumber: false,
                 },
             );
         }
         default:
-            return { columnType: 'unknown', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'unknown',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
     }
-    return { columnType: 'unknown', nullable: false, literal: false, array: false };
+    return {
+        columnType: 'unknown',
+        nullable: false,
+        literal: false,
+        array: false,
+        isWeirdNumber: false,
+    };
 }
 
 export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
     switch (arg.type) {
         case AST_NODE_TYPES.TSStringKeyword:
-            return { columnType: 'string', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'string',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
 
         case AST_NODE_TYPES.TSBigIntKeyword:
         case AST_NODE_TYPES.TSNumberKeyword:
-            return { columnType: 'number', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'number',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
 
         case AST_NODE_TYPES.TSBooleanKeyword:
-            return { columnType: 'boolean', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'boolean',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
 
         case AST_NODE_TYPES.TSNullKeyword:
-            return { columnType: 'unknown', nullable: true, literal: false, array: false };
+            return {
+                columnType: 'unknown',
+                nullable: true,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
 
         case AST_NODE_TYPES.TSTypeReference:
             if (arg.typeName.type === AST_NODE_TYPES.Identifier && arg.typeName.name === 'Date') {
-                return { columnType: 'Date', nullable: false, literal: false, array: false };
+                return {
+                    columnType: 'Date',
+                    nullable: false,
+                    literal: false,
+                    array: false,
+                    isWeirdNumber: false,
+                };
             }
-            return { columnType: 'unknown', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'unknown',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
 
         case AST_NODE_TYPES.TSUnionType:
             return arg.types.reduce<ColumnType>(
@@ -282,6 +382,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
                             nullable: current.nullable || acc.nullable,
                             literal: current.literal || acc.literal,
                             array: current.array || acc.array,
+                            isWeirdNumber: current.isWeirdNumber || acc.isWeirdNumber,
                         };
                     }
                     return acc;
@@ -291,6 +392,7 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
                     nullable: false,
                     literal: false,
                     array: false,
+                    isWeirdNumber: false,
                 },
             );
         case AST_NODE_TYPES.TSLiteralType: // Literal type
@@ -303,14 +405,33 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
                             nullable: false,
                             literal: true,
                             array: false,
+                            isWeirdNumber: false,
                         };
                     }
-                    return { columnType: 'unknown', nullable: false, literal: true, array: false };
+                    return {
+                        columnType: 'unknown',
+                        nullable: false,
+                        literal: true,
+                        array: false,
+                        isWeirdNumber: false,
+                    };
                 }
                 case AST_NODE_TYPES.TemplateLiteral:
-                    return { columnType: 'string', nullable: false, literal: true, array: false };
+                    return {
+                        columnType: 'string',
+                        nullable: false,
+                        literal: true,
+                        array: false,
+                        isWeirdNumber: false,
+                    };
                 default:
-                    return { columnType: 'unknown', nullable: false, literal: true, array: false };
+                    return {
+                        columnType: 'unknown',
+                        nullable: false,
+                        literal: true,
+                        array: false,
+                        isWeirdNumber: false,
+                    };
             }
 
         case AST_NODE_TYPES.TSArrayType: {
@@ -324,7 +445,13 @@ export function convertTypeToColumnType(arg: TSESTree.TypeNode): ColumnType {
         case AST_NODE_TYPES.TSUndefinedKeyword:
         case AST_NODE_TYPES.TSUnknownKeyword:
         default:
-            return { columnType: 'unknown', nullable: false, literal: false, array: false };
+            return {
+                columnType: 'unknown',
+                nullable: false,
+                literal: false,
+                array: false,
+                isWeirdNumber: false,
+            };
     }
 }
 

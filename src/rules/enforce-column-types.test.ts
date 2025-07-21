@@ -262,10 +262,17 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
         },
         {
-            name: 'should allow primary columns',
+            name: 'should allow int primary columns',
             code: `class Entity {
                 @PrimaryColumn()
                 id: number;
+            }`,
+        },
+        {
+            name: 'should allow string primary columns',
+            code: `class Entity {
+                @PrimaryColumn()
+                id: string;
             }`,
         },
         {
@@ -404,7 +411,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
             errors: [
                 {
-                    messageId: 'typescript_typeorm_column_mismatch',
+                    messageId: 'typescript_typeorm_column_mismatch_weird',
                     suggestions: [
                         {
                             messageId: 'typescript_typeorm_column_suggestion',
@@ -425,7 +432,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             }`,
             errors: [
                 {
-                    messageId: 'typescript_typeorm_column_mismatch',
+                    messageId: 'typescript_typeorm_column_mismatch_weird',
                     suggestions: [
                         {
                             messageId: 'typescript_typeorm_column_suggestion',
@@ -447,7 +454,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             options: [{ driver: 'sqlite' }],
             errors: [
                 {
-                    messageId: 'typescript_typeorm_column_mismatch',
+                    messageId: 'typescript_typeorm_column_mismatch_weird_sqlite',
                     suggestions: [
                         {
                             messageId: 'typescript_typeorm_column_suggestion',
@@ -469,7 +476,7 @@ ruleTester.run('enforce-column-types', enforceColumnTypes, {
             options: [{ driver: 'sqlite' }],
             errors: [
                 {
-                    messageId: 'typescript_typeorm_column_mismatch',
+                    messageId: 'typescript_typeorm_column_mismatch_weird_sqlite',
                     suggestions: [
                         {
                             messageId: 'typescript_typeorm_column_suggestion',
