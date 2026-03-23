@@ -2,10 +2,13 @@
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-03-23
+
 ### Changed
 
 - Add support for ESLint 10
 - Update dependencies
+- Drop support for Node 18
 
 ## [0.5.2] - 2025-12-22
 
