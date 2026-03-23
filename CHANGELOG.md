@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Add support for ESLint 10
+- Update dependencies
+
 ## [0.5.2] - 2025-12-22
 
 ### Changed
