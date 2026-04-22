@@ -41,6 +41,7 @@ export default tseslint.config(
   {
     plugins: {'typeorm-typescript': typeormTypescriptPlugin},
     rules: {
+      "typeorm-typescript/enforce-column-name": ["error", { "prefer": "snake_case", "specifyName": "non-default" }],
       "typeorm-typescript/enforce-column-types": "error",
       "typeorm-typescript/enforce-relation-types": "warn",
       "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "always" }]
@@ -73,6 +74,67 @@ For more information, see an example of the [legacy configuration](./examples/le
 TypeORM has no way to statically analyze if there is an inconsistency in the annotated TypeScript types.
 With the addition, that there are some confusing rules around nullability (relations are nullable by default,
 but columns aren't), it makes it easy to make mistakes. These ESLint rules will spot these issues, and suggest fixes.
+
+### typeorm-typescript/enforce-column-name
+
+TypeORM column decorators can derive a database column name from the property name, but teams often want to enforce a specific naming style or require explicit `name` declarations in non-default cases. This rule checks TypeORM column decorators whose names end with `Column` and support the `name` option.
+
+Use `prefer` to choose the database naming style:
+
+- `snake_case` (default)
+- `lowerCamelCase`
+
+Use `specifyName` to control when `name` must be written explicitly:
+
+- `non-default` (default): only require `name` when the default derived name would not match the preferred convention; redundant default names are reported
+- `always`: always require `name`
+
+#### Configuration
+
+```json
+{
+  "rules": {
+    "typeorm-typescript/enforce-column-name": ["error", {
+      "prefer": "snake_case",
+      "specifyName": "non-default"
+    }]
+  }
+}
+```
+
+#### Examples
+
+Examples of **incorrect code** for this rule:
+
+```ts
+class Entity {
+    // Name does not match snake_case convention
+    @Column({ name: "createdAt" })
+    createdAt: Date;
+
+    // Missing explicit name for non-snake_case property
+    @Column()
+    userID: string;
+}
+```
+
+Examples of **correct code** for this rule:
+
+```ts
+class Entity {
+    // Property already matches convention, no name needed
+    @Column()
+    id: number;
+
+    // Explicit name converts to snake_case
+    @Column({ name: "user_id" })
+    userID: string;
+
+    // Explicit name converts to snake_case
+    @Column({ name: "created_at" })
+    createdAt: Date;
+}
+```
 
 ### typeorm-typescript/enforce-column-types
 
