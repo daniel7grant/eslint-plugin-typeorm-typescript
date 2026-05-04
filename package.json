@@ -44,7 +44,7 @@
         "@eslint/js": "^10.0.1",
         "@types/eslint": "^9.6.0",
         "@types/node": "^25.0.3",
-        "@typescript-eslint/rule-tester": "^8.0.0",
+        "@typescript-eslint/rule-tester": "^8.59.1",
         "eslint": "^10.1.0",
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-prettier": "^5.0.1",
@@ -53,8 +53,8 @@
         "vitest": "^3.0.4"
     },
     "dependencies": {
-        "@typescript-eslint/parser": "^8.0.0",
-        "@typescript-eslint/utils": "^8.0.0",
+        "@typescript-eslint/parser": "^8.59.1",
+        "@typescript-eslint/utils": "^8.59.1",
         "typescript": "^6.0.2",
         "vite": "^7.0.5"
     }
