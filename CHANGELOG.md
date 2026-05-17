@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-05-17
+
+### Added
+
+- **NEW RULE** `enforce-column-name` (optional): Add support for forcing all column names to be defined as snake case or camel case ([#86](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/pull/86) by @TimonPeng)
+
+### Changed
+
+- Update dependencies
+
 ## [0.5.3] - 2026-03-23
 
 ### Changed
@@ -18,7 +28,7 @@
 
 ## [0.5.1] - 2025-07-21
 
-### Added 
+### Added
 
 - Add support for forcing all relations to be undefined by default ([#23](https://github.com/daniel7grant/eslint-plugin-typeorm-typescript/pull/23) by @davidenwang)
 
@@ -176,6 +186,6 @@
 
 ### Added
 
--   Initial release, with two rules
-    -   [typeorm-typescript/enforce-column-types](./README.md#typeorm-typescriptenforce-column-types): Checks if the TypeORM column's data type and TypeScript type is consistent.
-    -   [typeorm-typescript/enforce-relation-types](./README.md#typeorm-typescriptenforce-relation-types): Checks if the TypeORM relation's data type and TypeScript type is consistent.
+- Initial release, with two rules
+    - [typeorm-typescript/enforce-column-types](./README.md#typeorm-typescriptenforce-column-types): Checks if the TypeORM column's data type and TypeScript type is consistent.
+    - [typeorm-typescript/enforce-relation-types](./README.md#typeorm-typescriptenforce-relation-types): Checks if the TypeORM relation's data type and TypeScript type is consistent.

@@ -22,9 +22,9 @@ import tseslint from 'typescript-eslint';
 import typeormTypescriptRecommended from 'eslint-plugin-typeorm-typescript/recommended';
 
 export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  typeormTypescriptRecommended,
+    eslint.configs.recommended,
+    ...tseslint.configs.recommended,
+    typeormTypescriptRecommended,
 );
 ```
 
@@ -35,19 +35,21 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import typeormTypescriptPlugin from 'eslint-plugin-typeorm-typescript';
 
-export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  {
-    plugins: {'typeorm-typescript': typeormTypescriptPlugin},
+export default tseslint.config(eslint.configs.recommended, ...tseslint.configs.recommended, {
+    plugins: { 'typeorm-typescript': typeormTypescriptPlugin },
     rules: {
-      "typeorm-typescript/enforce-column-types": "error",
-      "typeorm-typescript/enforce-relation-types": "warn",
-      "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "always" }],
-      "typeorm-typescript/enforce-column-name": ["error", { "prefer": "snake_case", "specifyName": "non-default" }]
-    }
-  }
-);
+        'typeorm-typescript/enforce-column-types': 'error',
+        'typeorm-typescript/enforce-relation-types': 'warn',
+        'typeorm-typescript/enforce-consistent-nullability': [
+            'error',
+            { specifyNullable: 'always' },
+        ],
+        'typeorm-typescript/enforce-column-name': [
+            'error',
+            { prefer: 'snake_case', specifyName: 'non-default' },
+        ],
+    },
+});
 ```
 
 For more information, see an example of the [recommended configuration](./examples/recommended/) or the [customized configuration](./examples/customized/).
@@ -58,12 +60,12 @@ If you are still on legacy ESLint, update `.eslintrc.json` with the plugin to th
 
 ```json
 {
-  "plugins": ["typeorm-typescript"],
-  "rules": {
-    "typeorm-typescript/enforce-column-types": "error",
-    "typeorm-typescript/enforce-relation-types": "error",
-    "typeorm-typescript/enforce-consistent-nullability": "error"
-  }
+    "plugins": ["typeorm-typescript"],
+    "rules": {
+        "typeorm-typescript/enforce-column-types": "error",
+        "typeorm-typescript/enforce-relation-types": "error",
+        "typeorm-typescript/enforce-consistent-nullability": "error"
+    }
 }
 ```
 
@@ -89,11 +91,11 @@ It also handle primary columns (`number` by default), create and update columns 
 
 ```json
 {
-  "rules": {
-    "typeorm-typescript/enforce-column-types": "error",
-    // If you are using SQLite, set the driver
-    "typeorm-typescript/enforce-relation-types": ["error", { "driver": "sqlite" }],
-  }
+    "rules": {
+        "typeorm-typescript/enforce-column-types": "error",
+        // If you are using SQLite, set the driver
+        "typeorm-typescript/enforce-relation-types": ["error", { "driver": "sqlite" }]
+    }
 }
 ```
 
@@ -104,11 +106,11 @@ Examples of **incorrect code** for this rule:
 ```ts
 class Entity {
     // Should be string
-    @Column({ type: "varchar" })
+    @Column({ type: 'varchar' })
     name: number;
 
     // Should be string | null
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     name: string;
 
     // Should be Date | null
@@ -122,11 +124,11 @@ Examples of **correct code** for this rule:
 ```ts
 class Entity {
     // TypeORM data type and TypeScript type are consistent
-    @Column({ type: "varchar" })
+    @Column({ type: 'varchar' })
     name: string;
 
     // Nullability is correct
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     name: string | null;
 }
 ```
@@ -149,13 +151,13 @@ wrapped with `Relation<...>`.
 
 ```json
 {
-  "rules": {
-    "typeorm-typescript/enforce-relation-types": "error",
-    // If you want to force null-checking before accessing a relation 
-    "typeorm-typescript/enforce-relation-types": ["error", { "specifyUndefined": "always" }],
-    // If you want to force setting Relation<...> everywhere
-    "typeorm-typescript/enforce-relation-types": ["error", { "specifyRelation": "always" }],
-  }
+    "rules": {
+        "typeorm-typescript/enforce-relation-types": "error",
+        // If you want to force null-checking before accessing a relation
+        "typeorm-typescript/enforce-relation-types": ["error", { "specifyUndefined": "always" }],
+        // If you want to force setting Relation<...> everywhere
+        "typeorm-typescript/enforce-relation-types": ["error", { "specifyRelation": "always" }]
+    }
 }
 ```
 
@@ -233,9 +235,15 @@ that either only the non-default value is set (no parameters or `non-default`) o
     "rules": {
         // If you want to report an error for unnecessary nullables
         "typeorm-typescript/enforce-consistent-nullability": "error", // or
-        "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "non-default" }],
+        "typeorm-typescript/enforce-consistent-nullability": [
+            "error",
+            { "specifyNullable": "non-default" },
+        ],
         // If you want to force setting nullable everywhere to avoid confusion
-        "typeorm-typescript/enforce-consistent-nullability": ["error", { "specifyNullable": "always" }],
+        "typeorm-typescript/enforce-consistent-nullability": [
+            "error",
+            { "specifyNullable": "always" },
+        ],
     },
 }
 ```
@@ -249,7 +257,7 @@ With `{ "specifyNullable": "non-default" }`:
 ```ts
 class Entity {
     // Columns are non-nullable by default, remove it
-    @Column({ type: "varchar", nullable: false })
+    @Column({ type: 'varchar', nullable: false })
     name: number;
 
     // Relations are nullable by default, remove it
@@ -264,7 +272,7 @@ With `{ "specifyNullable": "always" }`:
 ```ts
 class Entity {
     // Mark this to nullable false to make it clear
-    @Column({ type: "varchar" })
+    @Column({ type: 'varchar' })
     name: number;
 
     // Mark this to nullable true to make it clear
@@ -281,10 +289,10 @@ With `{ "specifyNullable": "non-default" }`:
 ```ts
 class Entity {
     // Nullability only defined when it is different than default
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     middleName: number | null;
 
-    @Column({ type: "varchar" })
+    @Column({ type: 'varchar' })
     name: number;
 
     @OneToOne(() => Other)
@@ -298,10 +306,10 @@ With `{ "specifyNullable": "always" }`:
 ```ts
 class Entity {
     // Nullable is set everywhere, no default behaviour is implied
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     middleName: number | null;
 
-    @Column({ type: "varchar", nullable: false })
+    @Column({ type: 'varchar', nullable: false })
     name: number;
 
     @OneToOne(() => Other, { nullable: true })
@@ -328,12 +336,15 @@ Use `specifyName` to control when `name` must be written explicitly:
 
 ```json
 {
-  "rules": {
-    "typeorm-typescript/enforce-column-name": ["error", {
-      "prefer": "snake_case",
-      "specifyName": "non-default"
-    }]
-  }
+    "rules": {
+        "typeorm-typescript/enforce-column-name": [
+            "error",
+            {
+                "prefer": "snake_case",
+                "specifyName": "non-default"
+            }
+        ]
+    }
 }
 ```
 
@@ -344,7 +355,7 @@ Examples of **incorrect code** for this rule:
 ```ts
 class Entity {
     // Name does not match snake_case convention
-    @Column({ name: "createdAt" })
+    @Column({ name: 'createdAt' })
     createdAt: Date;
 
     // Missing explicit name for non-snake_case property
@@ -362,11 +373,11 @@ class Entity {
     id: number;
 
     // Explicit name converts to snake_case
-    @Column({ name: "user_id" })
+    @Column({ name: 'user_id' })
     userID: string;
 
     // Explicit name converts to snake_case
-    @Column({ name: "created_at" })
+    @Column({ name: 'created_at' })
     createdAt: Date;
 }
 ```
