@@ -32,5 +32,6 @@ jobs:
         with:
           changelog: CHANGELOG.md
           token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !contains(github.repository, 'rc') }}
       - name: Publish to NPM
         run: npm publish --provenance --access public
