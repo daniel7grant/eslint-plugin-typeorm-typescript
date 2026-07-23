@@ -117,8 +117,7 @@ export function convertArgumentToRelationType(
 
     const options = findObjectArgument(restArguments);
     const parsedOptions = parseObjectLiteral(options) as
-        | { nullable?: boolean; eager?: boolean }
-        | undefined;
+        { nullable?: boolean; eager?: boolean } | undefined;
 
     // OneToMany, ManyToMany
     if (relation === 'OneToMany' || relation === 'ManyToMany') {
