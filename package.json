@@ -43,7 +43,7 @@
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "@types/eslint": "^9.6.0",
-        "@types/node": "^25.0.3",
+        "@types/node": "^26.6.6",
         "@typescript-eslint/rule-tester": "^8.0.0",
         "eslint": "^10.1.0",
         "eslint-config-prettier": "^10.0.1",
