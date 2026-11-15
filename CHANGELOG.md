@@ -5,6 +5,7 @@
 ### Changed
 
 - Update dependencies, remove unneeded Vite dependency
+- Update vitest to version 5
 - Update build Node version to 26 (still keeping compatibility back to Node 20+)
 
 ## [0.5.4] - 2026-05-17

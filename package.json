@@ -26,7 +26,7 @@
         "build": "npm run build:cjs && npm run build:es",
         "watch": "tsc --watch -p tsconfig.es.json",
         "lint": "eslint src/",
-        "test": "vitest run"
+        "test": "vitest run src/"
     },
     "homepage": "https://github.com/daniel7grant/eslint-plugin-typeorm-typescript",
     "repository": {
@@ -50,7 +50,7 @@
         "eslint-plugin-prettier": "^5.0.1",
         "prettier": "^3.1.0",
         "typescript-eslint": "^8.0.0",
-        "vitest": "^3.0.4"
+        "vitest": "^5.1.0"
     },
     "dependencies": {
         "@typescript-eslint/parser": "^8.0.0",
