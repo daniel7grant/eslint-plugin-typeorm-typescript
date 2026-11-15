@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-11-15
+
 ### Changed
 
 - Update dependencies, remove unneeded Vite dependency
